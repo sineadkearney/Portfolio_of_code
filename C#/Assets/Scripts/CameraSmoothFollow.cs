@@ -26,11 +26,14 @@ public class CameraSmoothFollow : MonoBehaviour {
 	private float curPos			= 0.0f; //current position of player (cameraTarget)
 	private float playerJumpHeight 	= 0.0f; //distance the camera zooms out relies on jump height
 	
+	private float initialTargetX	= 0.0f;
+	private float initialTargetY	= 0.0f;
 	
 	void Start()
 	{
 		thisTransform = this.transform; //==  this.transform
-		
+		initialTargetX = cameraTarget.transform.position.x;
+		initialTargetY = cameraTarget.transform.position.y;
 	}
 	
 	void Update ()
@@ -39,48 +42,83 @@ public class CameraSmoothFollow : MonoBehaviour {
 		float transY = thisTransform.position.y;
 		float transCamX = cameraTarget.transform.position.x;
 		float transCamY = cameraTarget.transform.position.y;
-		if (cameraFollowX)
-		{
-			//thisTransform.position.x  =  Mathf.SmoothDamp(transX, transCamX, ref velocity.x, smoothTime);	
-			thisTransform.position  = new Vector3 (Mathf.SmoothDamp(transX, transCamX, ref velocity.x, smoothTime), thisTransform.position.y, thisTransform.position.z);
-			//    transform.position = new Vector3 (transform.position.x, 0, transform.position.z);
-		}
 		
-		if (cameraFollowY)
+		//move camera manually
+		if(Input.GetButton ("Fire1"))
 		{
-			//thisTransform.position.y  =  Mathf.SmoothDamp(transY, transCamY, ref  velocity.y, smoothTime);	
-			thisTransform.position  = new Vector3 (thisTransform.position.x, Mathf.SmoothDamp(transY, transCamY, ref  velocity.y, smoothTime), thisTransform.position.z);
+    		Vector3 mousePos = camera.ScreenToWorldPoint(Input.mousePosition);
+			float maxX = 7.0f;
+			float maxY = 3.0f;
 			
-		}
-		else if (cameraFollowHeight) //!cameraFollowY
-		{
-			//camera.transform.position.y = cameraHeight;
-			camera.transform.position = new Vector3(camera.transform.position.x, cameraHeight, camera.transform.position.z);
-		}
-		
-		playerControls playerControl =  player.GetComponent<playerControls>();
-		
-		if (cameraZoom)
-		{
-			//get current position of player's current Y position (getComponent -> where's  player)
-			curPos = player.transform.position.y; //will change even even moving through the air
-			playerJumpHeight = curPos - playerControl.startPos; //startPos does no update once Mario is in the air
-			//subtract current height from playerControl position
-			
-			//check for player's position and how it relates to the curPos and cur jump height position
-			if  (playerJumpHeight < 0) //negative
+			//check for  x-axis extremes
+			if (mousePos.x > transCamX + maxX)
 			{
-				playerJumpHeight *= -1;
+				//impose cap
+				mousePos.x  = transCamX + maxX;
 			}
-			if (playerJumpHeight > cameraZoomMax)
+			else if (mousePos.x < transCamX - maxX)
 			{
-				playerJumpHeight = cameraZoomMax;
+				//impose cap
+				mousePos.x  = transCamX - maxX;
+			}
+			//check for  y-axis extremes
+			if (mousePos.y > transCamY + maxY)
+			{
+				//impose cap
+				mousePos.y  = transCamY + maxY;
+			}
+			else if (mousePos.y < transCamY - (maxY*1.5f)) //allow for more of a "pull" on the camera when looking down
+			{
+				//impose cap
+				mousePos.y  = transCamY - (maxY*1.5f);
+			}
+			//increasing the value of smoothTime means that the camera moves slower
+			thisTransform.position  = new Vector3 (Mathf.SmoothDamp(transX, mousePos.x, ref velocity.x, smoothTime*6), Mathf.SmoothDamp(transY, mousePos.y, ref  velocity.y, smoothTime*6), thisTransform.position.z);
+    	}
+		
+		else //move camera automatically
+		{
+			if (cameraFollowX)
+			{
+				thisTransform.position  = new Vector3 (Mathf.SmoothDamp(transX, transCamX, ref velocity.x, smoothTime), Mathf.SmoothDamp(transY, initialTargetY, ref  velocity.y, smoothTime), thisTransform.position.z);
 			}
 			
-			//adjust the orthograhic size from camera to equal height jump distance (Lerp)
-			this.camera.orthographicSize = Mathf.Lerp(this.camera.orthographicSize,  playerJumpHeight + cameraZoomMin, Time.time * cameraZoomTime);
-			//
+			if (cameraFollowY)
+			{
+				//thisTransform.position.y  =  Mathf.SmoothDamp(transY, transCamY, ref  velocity.y, smoothTime);	
+				thisTransform.position  = new Vector3 (Mathf.SmoothDamp(transX, initialTargetX, ref  velocity.x, smoothTime), Mathf.SmoothDamp(transY, transCamY, ref  velocity.y, smoothTime), thisTransform.position.z);
+				
+			}
+			else if (cameraFollowHeight) //!cameraFollowY
+			{
+				//camera.transform.position.y = cameraHeight;
+				camera.transform.position = new Vector3(camera.transform.position.x, cameraHeight, camera.transform.position.z);
+			}
+			
+			playerControls playerControl =  player.GetComponent<playerControls>();
+			
+			if (cameraZoom)
+			{
+				//get current position of player's current Y position (getComponent -> where's  player)
+				curPos = player.transform.position.y; //will change even even moving through the air
+				playerJumpHeight = curPos - playerControl.startPos; //startPos does no update once Mario is in the air
+				//subtract current height from playerControl position
+				
+				//check for player's position and how it relates to the curPos and cur jump height position
+				if  (playerJumpHeight < 0) //negative
+				{
+					playerJumpHeight *= -1;
+				}
+				if (playerJumpHeight > cameraZoomMax)
+				{
+					playerJumpHeight = cameraZoomMax;
+				}
+				
+				//adjust the orthograhic size from camera to equal height jump distance (Lerp)
+				this.camera.orthographicSize = Mathf.Lerp(this.camera.orthographicSize,  playerJumpHeight + cameraZoomMin, Time.time * cameraZoomTime);
+				//
+			}
+		
 		}
 	}
-		
 }

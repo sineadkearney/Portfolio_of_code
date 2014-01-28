@@ -13,14 +13,17 @@ public class hudController : MonoBehaviour {
 	
 public GUIText livesText;
 public GUIText coinsText;
+public GUISkin newSkin;				//GUI skin applied to buttons
 	
-private bool isPaused = false;
+	
+public bool isPaused = false; //accessed by the pause Menu
+private Rect pauseRect;
 private int index = 0;						//index of animation sprite for counting through numbers
 //private 
 //int coin = 0;						//hold coin amount and set in animation sprite. Should get value from player
 //coin was private, but needs to be accessed by itemPickup.js
 
-	private SpeechManager speechManager;
+public SpeechManager speechManager; //accessed by the options Menu, when using the Kinect
 	private playerProperties pProp;
 	
 	void Start()
@@ -28,15 +31,14 @@ private int index = 0;						//index of animation sprite for counting through num
 		GameObject playerGameObject = GameObject.Find("hero");					//get player and set to pProp
 		pProp = playerGameObject.GetComponent<playerProperties>();
 		
-		speechManager = GameObject.Find("speech").GetComponent<SpeechManager>();
-		//speechManager = GameObject.FindGameObjectWithTag("speech").GetComponent<SpeechManager>();
-		
-		
+		//speechManager = GameObject.Find("speech").GetComponent<SpeechManager>();
+		speechManager = GameObject.FindWithTag("kinect-speech").GetComponent<SpeechManager>();
+			
 	}
 	
 void Update ()
 {
-	if(speechManager != null && speechManager.IsSapiInitialized())
+	if(speechManager != null && speechManager.enabled && speechManager.IsSapiInitialized())
 		{
 			if(speechManager.IsPhraseRecognized())
 			{
@@ -60,15 +62,13 @@ void Update ()
 					case "PAUSE":
 						if (!isPaused)
 							{
-								isPaused = true;
-								Time.timeScale = 0.0f;
+								pause ();
 							}
 						break;
 					case "RESUME":
 						if (isPaused)
 							{
-								isPaused = false;
-								Time.timeScale = 1.0f;
+								resume ();
 							}
 					break;
 	
@@ -78,16 +78,14 @@ void Update ()
 			}
 			
 		}
-	else if (Input.GetButtonDown("Jump") && !isPaused) //pause
-		{
-			isPaused = true;
-			Time.timeScale = 0.0f;
-		}
-		else if (Input.GetButtonDown("Jump") && isPaused) //resume
-		{
-			isPaused = false;
-			Time.timeScale = 1.0f;
-		}
+	else if (Input.GetButtonDown("pause") && !isPaused) //pause
+	{
+		pause();
+	}
+	else if (Input.GetButtonDown("pause") && isPaused) //resume
+	{
+		resume ();
+	}
 		
 		
 	int lives = pProp.lives; //set lives to player properties lives
@@ -105,5 +103,30 @@ void Update ()
 
 
 }
+	void OnGUI () {
+	    //load GUI skin
+	    GUI.skin = newSkin;
+	    if(!isPaused && GUI.Button(new Rect(Screen.width-100, 0, 100, 40), "Pause")) //button doesn't appear when isPaused, ie, pause/options menu is on screen
+		{
+			pause();
+	    }
+	}
+	
+	void pause()
+	{
+		isPaused = true;
+		Time.timeScale = 0.0f;
+		pauseMenu pMenu = GetComponent<pauseMenu>();
+		pMenu.enabled = true;
+	}
+	
+	void resume()
+	{
+		isPaused = false;
+		Time.timeScale = 1.0f;
+		pauseMenu pMenu = GetComponent<pauseMenu>();
+		pMenu.enabled = false;
+	}
+	
 
 }

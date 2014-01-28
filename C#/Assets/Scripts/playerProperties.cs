@@ -46,6 +46,11 @@ private bool isDead			= false;
 void Start()
 {
 		anim = GetComponent<Animator>();
+		coins = PlayerPrefs.GetInt("playerCoins");
+		if (PlayerPrefs.HasKey("playerLives"))
+		{
+			lives = PlayerPrefs.GetInt("playerLives");
+		} //else stays 3
 }
 	
 void Update()

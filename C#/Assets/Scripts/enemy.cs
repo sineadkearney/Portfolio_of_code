@@ -16,28 +16,28 @@ public enum EnemyState {
 	falling   = 6
 }
 
-public float moveSpeed			= 20.0f; 	//speed of gumba
-public float attackMoveSpeed	= 35.0f;		//speed up before attacking Mario
-public float jumpSpeed			= 3.0f; 		//equal to jump height
+public float moveSpeed			= 20.0f; 				//speed of enemy
+public float attackMoveSpeed	= 35.0f;				//speed up before attacking Mario
+public float jumpSpeed			= 3.0f; 				//equal to jump height
 public EnemyState enemyState = EnemyState.moveLeft;		//starting state
-public float attackRange		= 1.0f;		//set range for speed increase
-public float searchRange		= 3.0f;		//set ranfe for finding Mario
-public float returnHomeRange	= 4.0f;		//how far from central point before gumba has to go home
-public float changeDirectionDist= 0.5f;		//set distance to move past target
-public Transform chaseTarget;				//load up player/Mario target
-public Transform homePos;			//load up home position
-public float deathForce			= 3.0f;		//the force that Mario bumps off the gumba with
-public bool gizmoToggle			= true;	//toggle the display of debug radius
+public float attackRange		= 1.0f;					//set range for speed increase
+public float searchRange		= 3.0f;					//set range for finding Hero
+public float returnHomeRange	= 4.0f;					//how far from central point before enemy has to go home
+public float changeDirectionDist= 0.5f;					//set distance to move past target
+public Transform chaseTarget;							//load up player/Mario target
+public Transform homePos;								//load up home position
+public float deathForce			= 3.0f;					//the force that Hero bumps off the enemy with
+public bool gizmoToggle			= true;					//toggle the display of debug radius
 
 //var sound				: AudioClip;		//sound of Mario jumping on gumba
 //var soundDelay			: float = 0.0;		//amount of time to delay before playing sound again
 //var soundRate			: float = 0.0;		//variable holds current time & delay amount
 
-private Vector3 velocity	= new Vector3(0f,0f,0f);//a way to store the player's movement in velocity. A lot like Mario's player control
+private Vector3 velocity	= new Vector3(0f,0f,0f);	//a way to store the player's movement in velocity. A lot like Mario's player control
 private float gravity		= 20.0f;		
 private EnemyState currentState;
-private bool isRight		= false;	//is facing right
-private Vector3 myTransform;			//store initial position
+private bool isRight		= false;					//is facing right
+private Vector3 myTransform;							//store initial position
 private float resetMoveSpeed= 0.0f;
 private float distToHome	= 0.0f;
 private float distToTarget	= 0.0f;
@@ -51,7 +51,18 @@ private GameObject playerLink;
 	
 void Start ()
 {
-	myTransform = transform.position; //starting pos of gumba
+//	foreach (Transform child in transform)
+//		{
+//		if (child.name == "enemy_homePos"){
+//				homePos = child;
+//				print ("homePos set");
+//		// the code here is called
+//		// for each child named Bone
+//		}
+//	}
+		
+	myTransform = transform.position; //starting pos of enemy
+//	homePos = gameObject.GetComponentInChildren.;
 	resetMoveSpeed = moveSpeed;
 	linkToPlayerProperties = GetComponent<playerProperties>(); //Mario's properties?
 	controller = GetComponent<CharacterController>();	

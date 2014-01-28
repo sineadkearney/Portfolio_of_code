@@ -3,7 +3,7 @@ using System.Collections;
 
 public class playerControls : MonoBehaviour {
 	
-	public PointManController kpc;
+	public PointManController kpc; //accessed by optionsMenu
 	
 	public float  walkSpeed = 1.5f; //m  per sec, standard walk
 	public float  runSpeed  = 2.0f;
@@ -22,7 +22,7 @@ public class playerControls : MonoBehaviour {
 	
 	public float  startPos = 0.0f; //where Mario starts the level
 	public int moveDirection = 1; //which way he's facing. -1= left, 1 = right, default 1;
-	public bool useKinect = true; //toggle to use the input from the Kinect, or if false, use input from the keyboard only (for debugging)	
+	
 	
 	public AudioClip soundJump;
 	public AudioClip soundCrouchJump;		
@@ -31,15 +31,16 @@ public class playerControls : MonoBehaviour {
 		
 	public Vector3 velocity = new Vector3(0,0,0); //public as it is accessed by enemy.cs
 	
+	
 	private bool jumpEnable = false; //only chnage when key is pressed
 	private bool runJumpEnable = false;
 	private bool crouchJumpEnable = false;
 	private bool isWalking = false;
 	private bool isRunning = false;
 	private bool isCrouching = false;
+	private bool useKinect; //toggle to use the input from the Kinect, or if false, use input from the keyboard only (for debugging)	
 	private float afterHitForceDown = 1.0f; //used when player collides with a box, etc
 	
-
 	
 	//new
 	public Animator anim;					// Reference to the player's animator component. Accessed when enemy dies, throwing character into the air slightly
@@ -54,6 +55,7 @@ public class playerControls : MonoBehaviour {
 		//StartCoroutine(MyMethod());
 		//add a delay to allow kinect skeleton to form?
 		anim = GetComponent<Animator>();
+		kpc = GameObject.FindWithTag("kinect-pointMan").GetComponent<PointManController>();
 	}
 	
 	
@@ -61,7 +63,7 @@ public class playerControls : MonoBehaviour {
 	void Update ()
 	{
 		CharacterController controller = GetComponent<CharacterController>();	
-		
+		useKinect = PlayerPrefs.GetInt("useKinect") == 1; //1 = using the Kinect, 0 = not using the Kinect
 		
 		if (!isSwimming) //Mario is walking on land
 		{
