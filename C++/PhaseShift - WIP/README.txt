@@ -6,4 +6,5 @@ Some .mid files were throwing exceptions when the file was loaded. I e-mailed th
 
 This code uses the Juce library http://www.juce.com/
 
-See "The-Donnas.txt" for an expected example output.
+See "The Donnas - expected output" for an expected example output, taken from Java version of program.
+See "The Donnas - current output" for the current output of the program
