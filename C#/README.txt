@@ -1,7 +1,7 @@
 This is my Final Year Project.
 
 A video of the game in action:
-https://www.youtube.com/watch?v=LUkRz4Q7rAQ
+https://www.youtube.com/watch?v=8CmRUjlbEGU
 
 This game is designed to be similar in style to a classic 2D platformer, but instead of a controller, input to the game is via a Kinect camera
 I have a few more months to work on this, so this is still a crude work-in-progress version.
