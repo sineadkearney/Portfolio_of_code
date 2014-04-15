@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script>
+var myArray = new Array();
+var filmAmount = 0;
+var hasPrinted = false;
+var countAddedToArray = 0;
+
+function userInput(form)
+{
+	var input = form.imdbName.value;
+	if (new RegExp("^nm\\d\{7\}").test(input)) //valid imdb id
+	{
+		document.getElementById("results").innerHTML = "Working...";
+		actorSearch(input);
+	}
+	else //have to do a name search for name given
+	{
+		document.getElementById("results").innerHTML = "invalid name";
+	}
+}
+
+function actorSearch(name)
+{
+//search calls apifilms()
+$.ajax({
+	url: "http://www.myapifilms.com/search",
+    data: {
+        idName: name, //"nm0680983",
+		format: "JSONP",
+		lang:  "en%2Dus",
+		filmography: "1"
+    },
+    dataType: "jsonp",
+    crossDomain: true,
+    success: function(response) { 
+    }
+});
+}
+
+function apifilms(response)
+{
+	window.console.log(response);
+	document.getElementById("nameSearched").innerHTML = "Results for " + response.name + ":";
+	var arrayIndex = 0;
+	for (var i = 0; i < response.filmographys.length; i++)
+	{
+		if (response.filmographys[i].section == "Actress" || response.filmographys[i].section == "Actor")
+			arrayIndex = i;
+	}
+	
+	document.getElementById("results").innerHTML = "Films found. Sorting....";
+	window.console.log("got films. Querying each film");
+	var printThis = "";
+	var allFilms = response.filmographys[arrayIndex].filmography;
+	myArray = new Array(allFilms.length);
+	filmAmount = allFilms.length;
+	
+	for (var i = 0; i < allFilms.length; i++) //get information for each film/tv show
+	{
+		var ID = allFilms[i].IMDBId;
+		$.ajax({
+		url: "http://www.omdbapi.com/",
+		data: {
+			i: ID
+		},
+		dataType: "json",
+		crossDomain: true,
+		success: function(response) {
+			addToArray(response, i);
+			}
+		});
+		printThis += allFilms[i].title + ": " + allFilms[i].IMDBId + ",\n";
+	}
+	
+	window.console.log(printThis);
+	//alert(printThis);
+}
+
+function addToArray(response, i)
+{
+	myArray[countAddedToArray] = new Array(4);
+	myArray[countAddedToArray][0] =  response.Title;	//name of film
+	myArray[countAddedToArray][1] = response.imdbRating;//rating
+	myArray[countAddedToArray][2] = response.Year;		//year made
+	myArray[countAddedToArray][3] = response.imdbID;	//ttXXXXXXX, it's ID, for hyperlink
+	countAddedToArray += 1;
+	//window.console.log(myArray[i][0] + " " + myArray[i][1] + " (" + myArray[i][2] + ")");
+	
+	if (countAddedToArray == filmAmount && !hasPrinted) //this will only happen once
+	{
+		var printThis = "<ul>";
+		//window.console.log("i:" + i + " filmAmount:" + filmAmount);
+		myArray.sort(function(a,b){return a[1] - b[1];}); //sort by rating
+		for (var j = filmAmount-1; j  >=  0; j--) //highest rating first
+		{
+			window.console.log(myArray[j][0] + " " + myArray[j][1] + " (" + myArray[j][2] + ")");
+			if (new RegExp("\\.").test(myArray[j][1])) //if the rating contains a ".", ie it is film that has been rated, not an unreleased film, etc
+				printThis += "<li><a href=\"http://www.imdb.com/title/" + myArray[j][3] + "/\">"  + myArray[j][0] + "</a> " + myArray[j][1] + " (" + myArray[j][2] + ")</li>"
+				//make a list element, with a hyperlink to the imdb page for that film/tv show
+		}
+		printThis += "</ul>";
+		document.getElementById("results").innerHTML = printThis;
+		hasPrinted = true;
+	}
+}
+
+</script>
+</head>
+
+<body>
+
+<h4>Fill in one of the following</h4>
+<form>
+Name of Actor: <input type="text" name="realName"><br>
+IMDB ID (eg, nmXXXXXXX) <input type="text" name="imdbName"><br>
+<input type="button" value="Search!" onclick="userInput(this.form)" />
+</form>
+<p id="nameSearched"></p>
+<p id="results"></p>
+
+</body>
+</html> 
+
