@@ -3,40 +3,52 @@
 <head>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script>
-var myArray = new Array();
-var filmAmount = 0;
-var hasPrinted = false;
-var countAddedToArray = 0;
-
+//var myArray = new Array();
+//var filmAmount = 0;
+//var hasPrinted;
+//var countAddedToArray = 0;
+//var prof = ""; 
 function userInput(form)
 {
-	var input = form.imdbName.value;
-	if (new RegExp("^nm\\d\{7\}").test(input)) //valid imdb id
+	//reset global vars
+	window.hasPrinted = false;
+	window.countAddedToArray = 0;
+	window.filmAmount = 0;
+	window.myArray = new Array();
+	
+	window.inputID = form.imdbName.value; 
+	window.prof = form.profession.value; //the profession of the person we are searching for, eg Actor, Directior, etc
+
+	if (new RegExp("^nm\\d\{7\}").test(inputID)) //valid imdb id
 	{
 		document.getElementById("results").innerHTML = "Working...";
-		actorSearch(input);
+		actorSearch(inputID, prof);
 	}
-	else //have to do a name search for name given
+	else
 	{
-		document.getElementById("results").innerHTML = "invalid name";
+		document.getElementById("results").innerHTML = "invalid ID format";
 	}
 }
 
-function actorSearch(name)
+function actorSearch(name, prof)
 {
 //search calls apifilms()
 $.ajax({
 	url: "http://www.myapifilms.com/search",
     data: {
-        idName: name, //"nm0680983",
+        idName: name,
 		format: "JSONP",
 		lang:  "en%2Dus",
 		filmography: "1"
     },
     dataType: "jsonp",
     crossDomain: true,
-    success: function(response) { 
-    }
+    success: function(response) { },
+	error: function (xhr, ajaxOptions, thrownError) {
+        //alert(xhr.status);
+        //alert(thrownError);
+		document.getElementById("results").innerHTML = "Error: could not find the person related to this ID: " + inputID +"<br>Please ensure that it is correct";
+      }
 });
 }
 
@@ -44,37 +56,46 @@ function apifilms(response)
 {
 	window.console.log(response);
 	document.getElementById("nameSearched").innerHTML = "Results for " + response.name + ":";
-	var arrayIndex = 0;
+	var arrayIndex = -1;
+	
 	for (var i = 0; i < response.filmographys.length; i++)
 	{
-		if (response.filmographys[i].section == "Actress" || response.filmographys[i].section == "Actor")
+		if (response.filmographys[i].section == prof || (prof == "Actor" && response.filmographys[i].section == "Actress"))//"Actress" || response.filmographys[i].section == "Actor")
 			arrayIndex = i;
 	}
 	
-	document.getElementById("results").innerHTML = "Films found. Sorting....";
-	window.console.log("got films. Querying each film");
-	var printThis = "";
-	var allFilms = response.filmographys[arrayIndex].filmography;
-	myArray = new Array(allFilms.length);
-	filmAmount = allFilms.length;
-	
-	for (var i = 0; i < allFilms.length; i++) //get information for each film/tv show
+	var printThis = ""; //the response, console only
+	if (arrayIndex  != -1) //has been updated
 	{
-		var ID = allFilms[i].IMDBId;
-		$.ajax({
-		url: "http://www.omdbapi.com/",
-		data: {
-			i: ID
-		},
-		dataType: "json",
-		crossDomain: true,
-		success: function(response) {
-			addToArray(response, i);
-			}
-		});
-		printThis += allFilms[i].title + ": " + allFilms[i].IMDBId + ",\n";
+		document.getElementById("results").innerHTML = "Films found. Sorting....";
+		window.console.log("got films. Querying each film");
+		printThis = "profession: " + prof + "\n";
+		var allFilms = response.filmographys[arrayIndex].filmography;
+		myArray = new Array(allFilms.length);
+		filmAmount = allFilms.length;
+		
+		for (var i = 0; i < allFilms.length; i++) //get information for each film/tv show
+		{
+			var ID = allFilms[i].IMDBId;
+			$.ajax({
+			url: "http://www.omdbapi.com/",
+			data: {
+				i: ID
+			},
+			dataType: "json",
+			crossDomain: true,
+			success: function(response) {
+				addToArray(response, i);
+				}
+			});
+			printThis += allFilms[i].title + ": " + allFilms[i].IMDBId + ",\n";
+		}
 	}
-	
+	else
+	{
+		printThis = "No results found for: " + prof;
+		document.getElementById("results").innerHTML = printThis;
+	}
 	window.console.log(printThis);
 	//alert(printThis);
 }
@@ -114,8 +135,40 @@ function addToArray(response, i)
 
 <h4>Fill in one of the following</h4>
 <form>
-Name of Actor: <input type="text" name="realName"><br>
-IMDB ID (eg, nmXXXXXXX) <input type="text" name="imdbName"><br>
+IMDB ID: (ie "nmXXXXXXX")<input type="text" name="imdbName"><br>
+This can be found in the URL of the person's IMDB profile page, eg http://www.imdb.com/name/<strong>nmXXXXXXX</strong><br>
+<br>
+
+Profession:
+<select name="profession">
+<option value="Actor">Actor</option>
+<option value="Writer">Writer</option>
+<option value="Director">Director</option>
+
+<option value="Animation department">Animation department</option>
+<option value="Art director">Art director</option>
+<option value="Art department">Art department</option>
+<option value="Casting Department">Casting Department</option>
+<option value="Casting director">Casting Director</option>
+<option value="Cinematographer">Cinematographer</option>
+<option value="Composer">Composer</option>
+<option value="Costume and Wardrobe Department">Costume and Wardrobe Department</option>
+<option value="Costume designer">Costume Designer</option>
+<option value="Editor">Editor</option>
+<option value="Editorial Department">Editorial Department</option>
+<option value="Makeup Department">Makeup Department</option>
+<option value="Music Department ">Music Department </option>
+<option value="Producer">Producer</option>
+<option value="Production designer">Production Designer</option>
+<option value="Self">Self</option>
+<option value="Set decorator">Set Decorator</option>
+<option value="Sound department">Sound Department</option>
+<option value="Special effects">Special effects</option>
+<option value="Stunts">Stunts</option>
+<option value="Visual effects">Visual effects</option>
+</select>
+
+<br><br>
 <input type="button" value="Search!" onclick="userInput(this.form)" />
 </form>
 <p id="nameSearched"></p>
