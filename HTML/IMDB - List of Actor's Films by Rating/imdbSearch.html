@@ -11,6 +11,7 @@ function userInput(form)
 	window.countAddedToArray = 0;
 	window.filmAmount = 0;
 	window.myArray = new Array();
+	window.resultsFound = false;
 	
 	window.inputID = form.imdbName.value; 
 	window.prof = form.profession.value; //the profession of the person we are searching for, eg Actor, Directior, etc
@@ -39,17 +40,13 @@ function actorSearch(name, prof)
 		},
 		dataType: "jsonp",
 		crossDomain: true,
-		success: function(response) { },
-		error: function (xhr, ajaxOptions, thrownError) {
-			//alert(xhr.status);
-			//alert(thrownError);
-			document.getElementById("results").innerHTML = "Error: could not find the person related to this ID: " + inputID +"<br>Please ensure that it is correct";
-		  }
+		success: function(response) { }
 	});
 }
 
 function apifilms(response)
 {
+
 	window.console.log(response);
 	document.getElementById("nameSearched").innerHTML = "Results for " + response.name + ":";
 	var arrayIndex = -1;
@@ -63,6 +60,7 @@ function apifilms(response)
 	var printThis = ""; //the response, console only
 	if (arrayIndex  != -1) //has been updated
 	{
+		resultsFound = true;
 		document.getElementById("results").innerHTML = "Films found. Sorting....";
 		window.console.log("got films. Querying each film");
 		printThis = "profession: " + prof + "\n";
@@ -91,6 +89,7 @@ function apifilms(response)
 	{
 		printThis = "No results found for: " + prof;
 		document.getElementById("results").innerHTML = printThis;
+		resultsFound = false;
 	}
 	window.console.log(printThis);
 }
@@ -127,13 +126,12 @@ function addToArray(response, i)
 
 <body>
 
-<h4>Fill in one of the following</h4>
 <form>
-IMDB ID: (ie "nmXXXXXXX")<input type="text" name="imdbName"><br>
+<strong>IMDB ID:</strong> (ie "nmXXXXXXX")<input type="text" name="imdbName"><br>
 This can be found in the URL of the person's IMDB profile page, eg http://www.imdb.com/name/<strong>nmXXXXXXX</strong><br>
 <br>
 
-Profession:
+<strong>Profession:</strong>
 <select name="profession">
 <option value="Actor">Actor</option>
 <option value="Writer">Writer</option>
