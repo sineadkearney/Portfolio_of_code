@@ -3,11 +3,7 @@
 <head>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script>
-//var myArray = new Array();
-//var filmAmount = 0;
-//var hasPrinted;
-//var countAddedToArray = 0;
-//var prof = ""; 
+
 function userInput(form)
 {
 	//reset global vars
@@ -32,24 +28,24 @@ function userInput(form)
 
 function actorSearch(name, prof)
 {
-//search calls apifilms()
-$.ajax({
-	url: "http://www.myapifilms.com/search",
-    data: {
-        idName: name,
-		format: "JSONP",
-		lang:  "en%2Dus",
-		filmography: "1"
-    },
-    dataType: "jsonp",
-    crossDomain: true,
-    success: function(response) { },
-	error: function (xhr, ajaxOptions, thrownError) {
-        //alert(xhr.status);
-        //alert(thrownError);
-		document.getElementById("results").innerHTML = "Error: could not find the person related to this ID: " + inputID +"<br>Please ensure that it is correct";
-      }
-});
+	//search calls apifilms()
+	$.ajax({
+		url: "http://www.myapifilms.com/search",
+		data: {
+			idName: name,
+			format: "JSONP",
+			lang:  "en%2Dus",
+			filmography: "1"
+		},
+		dataType: "jsonp",
+		crossDomain: true,
+		success: function(response) { },
+		error: function (xhr, ajaxOptions, thrownError) {
+			//alert(xhr.status);
+			//alert(thrownError);
+			document.getElementById("results").innerHTML = "Error: could not find the person related to this ID: " + inputID +"<br>Please ensure that it is correct";
+		  }
+	});
 }
 
 function apifilms(response)
@@ -58,10 +54,10 @@ function apifilms(response)
 	document.getElementById("nameSearched").innerHTML = "Results for " + response.name + ":";
 	var arrayIndex = -1;
 	
-	for (var i = 0; i < response.filmographys.length; i++)
+	for (var i = 0; i < response.filmographys.length; i++) //get the index that relates to the person profession
 	{
-		if (response.filmographys[i].section == prof || (prof == "Actor" && response.filmographys[i].section == "Actress"))//"Actress" || response.filmographys[i].section == "Actor")
-			arrayIndex = i;
+		if (response.filmographys[i].section == prof || (prof == "Actor" && response.filmographys[i].section == "Actress"))
+			arrayIndex = i; 
 	}
 	
 	var printThis = ""; //the response, console only
@@ -97,7 +93,6 @@ function apifilms(response)
 		document.getElementById("results").innerHTML = printThis;
 	}
 	window.console.log(printThis);
-	//alert(printThis);
 }
 
 function addToArray(response, i)
@@ -108,12 +103,11 @@ function addToArray(response, i)
 	myArray[countAddedToArray][2] = response.Year;		//year made
 	myArray[countAddedToArray][3] = response.imdbID;	//ttXXXXXXX, it's ID, for hyperlink
 	countAddedToArray += 1;
-	//window.console.log(myArray[i][0] + " " + myArray[i][1] + " (" + myArray[i][2] + ")");
+
 	
 	if (countAddedToArray == filmAmount && !hasPrinted) //this will only happen once
 	{
 		var printThis = "<ul>";
-		//window.console.log("i:" + i + " filmAmount:" + filmAmount);
 		myArray.sort(function(a,b){return a[1] - b[1];}); //sort by rating
 		for (var j = filmAmount-1; j  >=  0; j--) //highest rating first
 		{
