@@ -1,0 +1,427 @@
+
+<!--  Edited by XMLSpy  -->
+<pages>
+
+<link>
+<title>What is Android?</title>
+<url>android-os.php#what_is_android</url>
+</link>
+
+<link>
+<title>Android version</title>
+<url>android-os.php#what_is_android</url>
+</link>
+
+<link>
+<title>How to use Android?</title>
+<url>android-os.php#how_to_use_android</url>
+</link>
+
+<link>
+<title>Android Weblinks</title>
+<url>android-weblinks.php</url>
+</link>
+
+<link>
+<title>Android Classroom</title>
+<url>android-classroom.php</url>
+</link>
+
+<link>
+<title>Android Hardware</title>
+<url>android-hardware.php</url>
+</link>
+
+<link>
+<title>Android Tablets Specification</title>
+<url>spec-table.php</url>
+</link>
+
+<link>
+<title>Projector</title>
+<url>android-hardware.php#essential</url>
+</link>
+
+<link>
+<title>Tablet Case</title>
+<url>android-hardware.php#optional</url>
+</link>
+
+<link>
+<title>Visualiser</title>
+<url>android-hardware.php#optional</url>
+</link>
+
+<link>
+<title>Keyboard</title>
+<url>android-hardware.php#optional</url>
+</link>
+
+<link>
+<title>Android Research</title>
+<url>android-research.php</url>
+</link>
+
+<link>
+<title>Research and Media Articles</title>
+<url>android-research.php#articles</url>
+</link>
+
+<link>
+<title>Research Studies</title>
+<url>android-research.php#research_studies</url>
+</link>
+
+<link>
+<title>Android Testimonials</title>
+<url>android-testimonials.php</url>
+</link>
+
+<link>
+<title>Student Testimonials</title>
+<url>android-testimonials.php#pupils</url>
+</link>
+
+<link>
+<title>Android Support</title>
+<url>android-support.php</url>
+</link>
+
+<link>
+<title>What is the specification of the Tablets used in the Android Project?</title>
+<url>android-support.php#1</url>
+</link>
+
+<link>
+<title>How do I project my Android Desktop onto the Whiteboard?</title>
+<url>android-support.php#2</url>
+</link>
+
+<link>
+<title>My Projector does not have a HDMI Input socket. How can I use it?</title>
+<url>android-support.php#3</url>
+</link>
+
+<link>
+<title>Can I connect my Android to 'Apple TV' so that I can roam around the classroom?</title>
+<url>android-support.php#4</url>
+</link>
+
+<link>
+<title>Can I connect to my non-HDMI Pojector?</title>
+<url>android-support.php#5</url>
+</link>
+
+<link>
+<title>Can I use the Interactive Whiteboard in order to control the Tablet?</title>
+<url>android-support.php#6</url>
+</link>
+
+<link>
+<title>Does my classroom need to have Wifi internet access?</title>
+<url>android-support.php#7</url>
+</link>
+
+<link>
+<title>Can I view or control my Student Tablets from my Desktop?</title>
+<url>android-support.php#8</url>
+</link>
+
+<link>
+<title>Can I install Android Apps from a 'store'?</title>
+<url>android-support.php#9</url>
+</link>
+
+<link>
+<title>Can I install Androd Apps directly, or must I go via some 'store'?</title>
+<url>android-support.php#10</url>
+</link>
+
+<link>
+<title>Can I install a group of .apk files all at once?</title>
+<url>android-support.php#11</url>
+</link>
+
+<link>
+<title>Can I install a number of Apps across multiple Tablets?</title>
+<url>android-support.php#12</url>
+</link>
+
+<link>
+<title>Do I have to give my Credit Card details for the Google Play Store?</title>
+<url>android-support.php#13</url>
+</link>
+
+<link>
+<title>Can I 'lock down' the Tablets in order to control access to apps?</title>
+<url>android-support.php#14</url>
+</link>
+
+<link>
+<title>Contact</title>
+<url>contact.php</url>
+</link>
+
+<link>
+<title>Barry Donn</title>
+<url>contact.php#barry_donn</url>
+</link>
+
+<link>
+<title>Uptown Computers</title>
+<url>contact.php#barry_donn</url>
+</link>
+
+<link>
+<title>David Kearney</title>
+<url>contact.php#david_kearney</url>
+</link>
+
+<link>
+<title>David Kearney</title>
+<url>contact.php#david_kearney</url>
+</link>
+
+<link>
+<title>Apps for Primary Students - English</title>
+<url>apps-primary.php#english</url>
+</link>
+
+<link>
+<title>Apps for Primary Students - Irish/Gaeilge</title>
+<url>apps-primary.php#irish</url>
+</link>
+
+<link>
+<title>Apps for Primary Students - Geography</title>
+<url>apps-primary.php#geography</url>
+</link>
+
+<link>
+<title>Apps for Primary Students - History</title>
+<url>apps-primary.php#history</url>
+</link>
+
+<link>
+<title>Apps for Primary Students - Maths</title>
+<url>apps-primary.php#maths</url>
+</link>
+
+<link>
+<title>Apps for Primary Students - Music</title>
+<url>apps-primary.php#music</url>
+</link>
+
+<link>
+<title>Apps for Primary Students - Science</title>
+<url>apps-primary.php#science</url>
+</link>
+
+<link>
+<title>Apps for Primary Students - Typing</title>
+<url>apps-primary.php#typing</url>
+</link>
+
+<link>
+<title>Apps for Primary Students - Visual Arts</title>
+<url>apps-primary.php#arts</url>
+</link>
+
+
+<link>
+<title>Apps for Primary Students - All/Mixed Subjects</title>
+<url>apps-primary.php#allMixed</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - Art</title>
+<url>apps-postprimary.php#art</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - Business</title>
+<url>apps-postprimary.php#business</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - CSPE</title>
+<url>apps-postprimary.php#cspe</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - English</title>
+<url>apps-postprimary.php#english</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - Irish/Gaeilge</title>
+<url>apps-postprimary.php#irish</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - Geography</title>
+<url>apps-postprimary.php#geography</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - History</title>
+<url>apps-postprimary.php#history</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - Home Ec</title>
+<url>apps-postprimary.php#homeEc</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - Languages</title>
+<url>apps-postprimary.php#languages</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - Materials Technology</title>
+<url>apps-postprimary.php#matTech</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - Maths</title>
+<url>apps-postprimary.php#maths</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - Music</title>
+<url>apps-postprimary.php#music</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - PE/Health</title>
+<url>apps-postprimary.php#pe</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - Religion</title>
+<url>apps-postprimary.php#religion</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - Science</title>
+<url>apps-postprimary.php#Science</url>
+</link>
+
+<link>
+<title>Apps for Post Primary students - All Subjects</title>
+<url>apps-postprimary.php#all</url>
+</link>
+
+<link>
+<title>Apps for Teachers - All Subjects</title>
+<url>apps-teacher.php#all</url>
+</link>
+
+<link>
+<title>Apps for Teachers - Coding</title>
+<url>apps-teacher.php#coding</url>
+</link>
+
+<link>
+<title>Apps for Teachers - Creating</title>
+<url>apps-teacher.php#creating</url>
+</link>
+
+<link>
+<title>Apps for Teachers - Diagnostic</title>
+<url>apps-teacher.php#diagnostic</url>
+</link>
+
+<link>
+<title>Apps for Teachers - Editing</title>
+<url>apps-teacher.php#editing</url>
+</link>
+
+<link>
+<title>Apps for Teachers - Personal Development</title>
+<url>apps-teacher.php#personalDev</url>
+</link>
+
+<link>
+<title>Apps for Teachers - Publishing</title>
+<url>apps-teacher.php#publishing</url>
+</link>
+
+<link>
+<title>Apps for Teachers - Teaching Aid</title>
+<url>apps-teacher.php#teachingAid</url>
+</link>
+
+<link>
+<title>Apps for Teachers - Whiteboard</title>
+<url>apps-teacher.php#whiteboard</url>
+</link>
+
+<link>
+<title>Apps by Various Schools</title>
+<url>apps-teacher.php#schools</url>
+</link>
+
+<link>
+<title>Apps for Personal Use - Banking/Finance</title>
+<url>apps-personal.php#banking</url>
+</link>
+
+<link>
+<title>Apps for Personal Use - Cloud Storage</title>
+<url>apps-personal.php#cloud</url>
+</link>
+
+<link>
+<title>Apps for Personal Use - Entertainment/Hobbies</title>
+<url>apps-personal.php#entertainment</url>
+</link>
+
+<link>
+<title>Apps for Personal Use - Games</title>
+<url>apps-personal.php#games</url>
+</link>
+
+<link>
+<title>Apps for Personal Use - Networking/Communication</title>
+<url>apps-personal.php#netComm</url>
+</link>
+
+<link>
+<title>Apps for Personal Use - News/Media</title>
+<url>apps-personal.php#news</url>
+</link>
+
+<link>
+<title>Apps for Personal Use - Office</title>
+<url>apps-personal.php#office</url>
+</link>
+
+<link>
+<title>Apps for Personal Use - Property</title>
+<url>apps-personal.php#property</url>
+</link>
+
+<link>
+<title>Apps for Personal Use - Shopping</title>
+<url>apps-personal.php#shopping</url>
+</link>
+
+<link>
+<title>Apps for Personal Use - Travel</title>
+<url>apps-personal.php#travel</url>
+</link>
+
+<link>
+<title>Apps for Personal Use - Weather</title>
+<url>apps-personal.php#weather</url>
+</link>
+
+<link>
+<title>Apps for Special Needs Students</title>
+<url>apps-sn.php</url>
+</link>
+
+
+</pages>

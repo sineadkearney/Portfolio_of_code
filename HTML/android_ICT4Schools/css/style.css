@@ -1,0 +1,299 @@
+/*
+light grey: 	#FCFCFC
+dark green: 	#216343
+light green: 	#A9CABA
+mid green: 		#65A685
+*/
+
+#page-wrapper
+{
+	background-color: #FCFCFC !important;
+	padding-bottom: 20px
+}
+
+#page-wrapper a
+{
+	text-decoration: underline;
+}
+
+ html {
+  position: relative;
+  min-height: 100%;
+  margin-bottom: -100px !important;
+}
+
+body {
+    background-color: #65A685; /*#f8f8f8;*/
+	margin-bottom: 100px !important;
+}
+
+
+/* start footer */
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 100px;
+  background-color: #216343;
+}
+
+#footer-content
+{
+	color: #FCFCFC;
+	font-size: 16px;
+}
+
+.footer-entry {
+    text-align: center;
+  }
+/* end footer */
+
+/* start normal appearance for sidebar and header */
+@media (min-width: 768px){
+.navbar-header{
+    margin: 0 auto;
+    display: table;
+    table-layout: fixed;
+    float:none;
+}
+.navbar-default
+{
+	margin-top: 0
+}
+} 
+li.myActive a
+{
+	background-color: #FCFCFC !important;
+}
+
+.navbar-default, .navbar-default a, .navbar-toggle
+/*#sidebar, #sidebar a, .sidebar-search*/
+{
+	background-color: #A9CABA;
+	color: #216343;
+	font-weight: 600;
+	font-size: 15px;
+	/*text-align: center;*/
+}
+
+.navbar, .navbar a.navbar-brand
+{
+	background-color: #216343 !important;
+	color: #FCFCFC;
+	font-size: 20px;
+	
+	/*text-align: center;*/
+}
+
+
+.navbar a.navbar-brand:hover
+{
+	color: #FCFCFC;
+	text-decoration: underline;
+}
+
+.navbar, .sidebar ul li
+{
+	border-color: #216343;
+}
+
+hr
+{
+	border-color: #216343;
+	clear: both;
+}
+
+#searchForm
+{
+	width: 85% !important;
+	/*width: 180px !important*/
+}
+/* end normal appearance for sidebar and header */
+
+
+/* start hover style for sidebar */
+.nav>li>a:hover, .navbar-toggle:hover
+{
+	background-color: #65A685 !important;
+	text-decoration: underline; 
+}
+
+.nav>li>a:focus
+{
+	background-color: #A9CABA !important; /*over-writing boostrap, want the parent of a sub menu to be normal color onClick*/
+}
+
+.navbar a.navbar-brand:hover
+{
+	color: #FCFCFC;
+	text-decoration: underline; 
+}
+
+/* end hover style for sidebar */
+
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: #216343; /*set the color of the three bars in the "toggle menu" button*/
+}
+
+.page-header, #page-wrapper a, #page-wrapper a:hover, .popover-content a
+{
+	color: #216343;
+	font-weight: 600;
+}
+
+.page-header
+{
+	/*margin-top: 15px !important;
+	margin-bottom: 15px !important;*/
+	padding: 0px;
+	border-bottom: 0px;
+}
+
+/******************** app icons and popover start **************/
+.popover-medium {
+    min-width: 66% !important;/*350px;*/
+	background-color: #F2F7F4;
+}
+
+img.centered
+{
+    display: block;
+    margin-left: auto;
+    margin-right: auto 
+}
+
+.popover-icon
+{
+	min-height: 125px;
+}
+
+.popover-icon img
+{
+	height: 75px;
+	width: 75px;
+	border-radius: 10px;
+}
+
+.with-scroll 
+/* the popovers are only a certain size. Scrollbar appears if the height is more than 275 
+default android browser doesn't support scroll*/
+{
+	 max-height: 250px;
+    overflow-y: auto;
+	
+	
+}
+
+/******************** app icons and popover end **************/
+
+ /******** spec table start *********/
+ #example_paginate 
+ {
+	left: -20px;
+    position: absolute;
+	min-width: 100%;
+}
+
+.bottom_back_button/*, #example_filter*/
+ {
+	left: 20px;
+    position: absolute;
+}
+
+
+#specsTable_filter
+{
+	/*display: block; 
+	position: relative; 
+	top: -20px;*/
+}
+
+#specsTable, .bottom_back_button
+{
+	display: block; 
+	/*position: relative; 
+	top: -10px;*/
+}
+
+.tableHeader
+{
+	background-color: white;
+    color: black;
+}
+
+.back_button
+{
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.top_back_button
+{
+	/*display: block; 
+	position: relative; 
+	top: 20px;*/
+}
+
+ .mobile-only, /*.dataTables_info*/
+ {
+	display: none;
+ }
+ /******** spec table end *********/
+ 
+ .hardware-image
+{
+	margin-bottom: 16px;
+}
+
+ .mobile-only
+ {
+	display: none;
+ }
+ 
+ @media (max-width: 991px) {
+/* if we need to change things for mobile layouts*/
+
+ .mobile-only
+ {
+	display: block;
+ }
+ 
+}
+
+
+@media (max-width: 768px) {
+/* if we need to change things for mobile layouts*/
+
+.popover{
+    width: 100% !important;/*350px;*/
+    max-width: 100% !important;/*350px;*/
+}
+
+}
+
+@media (max-width: 350px) {
+/* if we need to change things for smaller mobile layouts*/
+
+.navbar a.navbar-brand /* the navbar stuff moves the link up beside the menu button, and puts a margin under the link*/
+{
+	margin-bottom: 20px;
+	position: absolute;
+	top: 0px;
+	width: 250px;
+}
+
+.navbar-header
+{
+	margin-bottom: 15px;
+}
+
+.footer /*the footer seems to have a bit of the background just under it. Increase the size of it slightly to cover it up*/
+{
+	height: 110px;
+}
+
+}
+
+}
+
