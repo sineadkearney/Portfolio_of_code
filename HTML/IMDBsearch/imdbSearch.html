@@ -31,7 +31,8 @@ function actorSearch(name, prof)
 {
 	//search calls apifilms()
 	$.ajax({
-		url: "http://www.myapifilms.com/search",
+		//url: "http://www.myapifilms.com/search", //deprecated
+		url: "http://www.myapifilms.com/imdb", //new, since the api has changed:
 		data: {
 			idName: name,
 			format: "JSONP",
@@ -40,7 +41,9 @@ function actorSearch(name, prof)
 		},
 		dataType: "jsonp",
 		crossDomain: true,
-		success: function(response) { }
+		success: function(response) {
+		apifilms(response); //new, since the api has changed:
+	}
 	});
 }
 
@@ -51,9 +54,10 @@ function apifilms(response)
 	document.getElementById("nameSearched").innerHTML = "Results for " + response.name + ":";
 	var arrayIndex = -1;
 	
-	for (var i = 0; i < response.filmographys.length; i++) //get the index that relates to the person profession
+	//changed "filmographys" to "filmographies"
+	for (var i = 0; i < response.filmographies.length; i++) //get the index that relates to the person profession
 	{
-		if (response.filmographys[i].section == prof || (prof == "Actor" && response.filmographys[i].section == "Actress"))
+		if (response.filmographies[i].section == prof || (prof == "Actor" && response.filmographies[i].section == "Actress"))
 			arrayIndex = i; 
 	}
 	
@@ -64,7 +68,7 @@ function apifilms(response)
 		document.getElementById("results").innerHTML = "Films found. Sorting....";
 		window.console.log("got films. Querying each film");
 		printThis = "profession: " + prof + "\n";
-		var allFilms = response.filmographys[arrayIndex].filmography;
+		var allFilms = response.filmographies[arrayIndex].filmography;
 		myArray = new Array(allFilms.length);
 		filmAmount = allFilms.length;
 		
