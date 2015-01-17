@@ -1,0 +1,203 @@
+body
+{
+	background-color: #FDF7FD;
+}
+
+hr
+{
+	border-color: #831E69;
+}
+
+.page-header
+{
+	border: none;
+	margin-bottom: 0px
+}
+
+span.glyphicon-h3 {
+    font-size: 18px;
+}
+
+.glyphicon-search
+{
+	font-size:20px
+}
+
+.clickable
+{
+	cursor: pointer;
+}
+
+.sectionEntry
+{
+	font-weight: 600;
+	color:  #831E69;
+}
+
+
+#searchBox
+{
+	margin-top: 10px;
+	margin-bottom: 10px
+}
+
+#welcomeImage
+{
+	margin-left: auto;
+    margin-right: auto;
+	display: block;
+}
+
+
+
+.page-header
+{
+	color: #831E69;
+}
+
+
+.navbar-default .navbar-nav>li>a
+{
+	/*	how to overwrite the links in navigation bar*/
+	padding-bottom:19px;
+	
+}
+
+
+.navbar-brand:hover
+{
+	color: #831E69 !important;	
+	text-decoration: underline;
+}
+
+.navbar-default .navbar-nav>li.myActive>a
+{
+	/*
+	how to overwrite the links in navigation bar
+	color:red;*/
+	color: white;
+	
+}
+
+.footer , .navbar, .navbar-toggle
+{
+	background-color: #ECD0F2 !important;
+	/*active: #D8A0E6*/
+}
+
+#footer-content
+{
+	margin-top: 20px
+}
+
+.footer-about
+{
+	margin-left: 50px
+}
+
+#about
+{
+	color: #555;
+	text-decoration: underline;
+}
+
+#navigation li.myActive
+{
+	/*font-weight: bold; works*/
+	background-color: #B578A5
+}
+
+#navigation li a:hover, .navbar-toggle:hover/*, .navbar-header:hover*/ /*if you want to change the colour of the text of the menu item onhover*/
+{
+	color: white;
+	background-color: #831E69 !important; 
+}
+
+hr
+{
+	border-color: #B578A5
+}
+
+.hideSection, .content a, .searchResult, .searchResult:hover
+{
+	color: #831E69;
+	text-decoration: underline; 
+}
+
+a.anchor{ /*anchors have to take into account the the navbar is fixed, and is roughly 60px tall*/
+display: block; 
+position: relative; 
+top: -60px;
+visibility: hidden;}
+
+@media (max-width: 400px) { 
+  .footer-entry { /* change the footer content to allign in the center when the screen is 768px or smaller*/
+    text-align: center;
+  }
+  
+  .footer { /* the footer needs to be longer on a small screen */
+	height: 140px
+  }
+  
+  .footer-about
+	{
+		margin-left: 0px
+	}
+
+  body {
+  /* Margin bottom by footer height */
+  margin-bottom: 130px;
+}
+
+}
+
+#searchBox
+{
+	float: right !important;
+}
+
+.footer-left
+{
+	margin-left: 10px
+}
+
+@media (max-width:1200px) { /*when the navbar turns into the mobile format (and all smaller screens)*/
+.navbar-default .navbar-nav>li>a
+{
+	padding-bottom:10px;
+	
+}
+
+#searchBox
+{
+	float: left !important;
+}
+
+.popover
+{
+	left: 40px !important;
+}
+
+.custom-search-form
+{
+	margin-top: 8px !important;
+	margin-bottom: 0px !important;
+}
+
+}
+
+.popover /* the popovers are only a certain size. Scrollbar appears if the height is more than 275 */
+{	
+    overflow-y: auto;
+}
+
+.content li
+{
+	margin-bottom: 5px
+}
+
+.custom-search-form
+{
+	margin-top: 8px;
+	margin-bottom: -8px;
+}

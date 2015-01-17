@@ -1,0 +1,220 @@
+
+<!--  Edited by XMLSpy  -->
+<pages>
+
+<link>
+<title>Websites - English</title>
+<url>websites.php#english</url>
+</link>
+<link>
+<title>Software - English</title>
+<url>software.php#english</url>
+</link>
+
+<link>
+<title>Websites - Art</title>
+<url>websites.php#art</url>
+</link>
+<link>
+<title>Software - Art</title>
+<url>software.php#art</url>
+</link>
+
+<link>
+<title>Websites - Business</title>
+<url>websites.php#business</url>
+</link>
+<link>
+<title>Software - Business</title>
+<url>software.php#business</url>
+</link>
+
+<link>
+<title>Websites - CSPE, SPHE, RSE</title>
+<url>websites.php#cspe</url>
+</link>
+
+<link>
+<title>Websites - French, German</title>
+<url>websites.php#french</url>
+</link>
+
+<link>
+<title>Websites - Gaeilge/Irish</title>
+<url>websites.php#gaeilge</url>
+</link>
+<link>
+<title>Software - Gaeilge/Irish</title>
+<url>software.php#gaeilge</url>
+</link>
+
+<link>
+<title>Websites - Geography</title>
+<url>websites.php#geography</url>
+</link>
+<link>
+<title>Software - Geography</title>
+<url>software.php#geography</url>
+</link>
+
+<link>
+<title>Websites - History</title>
+<url>websites.php#history</url>
+</link>
+<link>
+<title>Software - History</title>
+<url>software.php#history</url>
+</link>
+
+<link>
+<title>Websites - Home Economics</title>
+<url>websites.php#homeec</url>
+</link>
+<link>
+<title>Software - Home Economics</title>
+<url>software.php#homeec</url>
+</link>
+
+<link>
+<title>Websites - Maths</title>
+<url>websites.php#maths</url>
+</link>
+<link>
+<title>Software - Maths</title>
+<url>software.php#maths</url>
+</link>
+
+<link>
+<title>Websites - Music</title>
+<url>websites.php#music</url>
+</link>
+<link>
+<title>Software - Music</title>
+<url>software.php#music</url>
+</link>
+
+<link>
+<title>Websites - Science</title>
+<url>websites.php#science</url>
+</link>
+<link>
+<title>Software - Science</title>
+<url>software.php#science</url>
+</link>
+
+<link>
+<title>Websites - Latin, Greek, Classical Studies</title>
+<url>websites.php#latin</url>
+</link>
+
+<link>
+<title>Websites - Materials Technology - Wood, Metalwork, Technology</title>
+<url>websites.php#wood</url>
+</link>
+
+<link>
+<title>Websites - Religious Education</title>
+<url>websites.php#religion</url>
+</link>
+
+<link>
+<title>Websites - Typewriting</title>
+<url>websites.php#type</url>
+</link>
+
+<link>
+<title>Websites - Interactive Whiteboards</title>
+<url>websites.php#intwhite</url>
+</link>
+
+<link>
+<title>Websites - Inter-School Collaborations</title>
+<url>websites.php#collab</url>
+</link>
+
+<link>
+<title>Websites - Teacher Resources and Utilities</title>
+<url>websites.php#resource</url>
+</link>
+
+<link>
+<title>Websites - Online Brain-Storming / Concept-Mapping</title>
+<url>websites.php#brain</url>
+</link>
+
+<link>
+<title>Websites - Reference Material</title>
+<url>websites.php#reference</url>
+</link>
+
+<link>
+<title>Websites - Textbooks</title>
+<url>websites.php#textbook</url>
+</link>
+
+<link>
+<title>Websites - Games for Students</title>
+<url>websites.php#games</url>
+</link>
+
+<link>
+<title>Software - Languages</title>
+<url>software.php#lang</url>
+</link>
+
+<link>
+<title>Software - Special Education Needs</title>
+<url>software.php#specneeds</url>
+</link>
+
+<link>
+<title>Software - Teacher or Student Authoring Tools</title>
+<url>software.php#tools</url>
+</link>
+
+<link>
+<title>Software - Utilities</title>
+<url>software.php#utilities</url>
+</link>
+
+<link>
+<title>Andriod Tablets</title>
+<url>android_tablets.php</url>
+</link>
+
+<link>
+<title>Interactive Whiteboards</title>
+<url>interactive_whiteboards.php</url>
+</link>
+
+<link>
+<title>Researchers</title>
+<url>ict_research.php#researchers</url>
+</link>
+
+<link>
+<title>Research Documents/Reports</title>
+<url>ict_research.php#docs</url>
+</link>
+
+<link>
+<title>Research Dissertations</title>
+<url>ict_research.php#dissertations</url>
+</link>
+
+<link>
+<title>Research Publications</title>
+<url>ict_research.php#pub</url>
+</link>
+
+<link>
+<title>About</title>
+<url>about.php</url>
+</link>
+
+<link>
+<title>Contact</title>
+<url>about.php</url>
+</link>
+
+</pages>
