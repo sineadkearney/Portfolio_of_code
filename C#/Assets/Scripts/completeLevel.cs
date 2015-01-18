@@ -1,124 +1,96 @@
-﻿using UnityEngine;
+﻿// Description: Used to complete a level
+// Instruction: attach to gateway/door at the end of a level, and assign a level to load next
+//written by Sinéad Kearney
+
+using UnityEngine;
 using System.Collections;
-//using PlayerPrefsX;
 
 
-public class completeLevel : MonoBehaviour {
+public class CompleteLevel : MonoBehaviour {
 	
-	public Sprite open;
-	public Sprite closed;
+	public bool requireAction = true;	//true if the player must perform some action to enter the door. Else false
+	public string levelName;			//the level to load upon completing the current level
 	
-	public string levelName;
-	public bool requireAction;
-	public bool isOpen;
+	private bool isInBox = false; 		//true when player is in collision box, else false
+	private bool useKinect = false;
 	
-	private levelProperties lProp;
-	private playerProperties pProp;
-	private bool isCompleted; //if the level has been completed
-	private int levelIndex;
+	private PointManController pmc;
+	private GameObject player;
+	private LevelProperties lProp;
+	private PlayerProperties pProp;
 	
-	private bool isInBox = false; //true when player is in collision box, else false
-	
-	void OnLevelWasLoaded () //run only when the level is loaded 
+	void Start()
 	{ 
-		Start ();		
-	}
-	
-	void Start() //set the sprite to "open" or "closed"
-	{ 
-		lProp = GameObject.Find("levelProperties").GetComponent<levelProperties>();
-		pProp = GameObject.Find("hero").GetComponent<playerProperties>();
+		pmc = GameObject.FindWithTag("kinect-pointMan").GetComponent<PointManController>();
+		player = GameObject.FindWithTag("Player");
 		
-		if (isOpen)
-		{
-			GetComponent<SpriteRenderer>().sprite = open;
-			print (levelIndex +" open");
-		}
-		else
-		{
-			GetComponent<SpriteRenderer>().sprite = closed;
-			print (levelIndex + " closed");
-		}
+		lProp = GameObject.Find("levelProperties").GetComponent<LevelProperties>();
+		pProp = GameObject.Find("hero").GetComponent<PlayerProperties>();	
 	}
 	
 	void OnTriggerEnter (Collider other)
 	{
-		if (other.tag == "Player")
-		{
-				isInBox = true;
-//			print ("open: " + isOpen);
-		}
-		
+		if (other.tag == "Player" || other.transform.IsChildOf(player.transform))
+			isInBox = true;	
 	}
+	
 	void OnTriggerExit (Collider other)
 	{
-		if (other.tag == "Player")
-		{
-				isInBox = false;
-//			print ("open: " + isOpen);
-		}
-		
+		if (other.tag == "Player" || other.transform.IsChildOf(player.transform))
+			isInBox = false;		
 	}
 	
-	void Update() {
-        if (isInBox && requireAction && Input.GetButtonDown("Jump") && isOpen)
-            Debug.Log("levelIndex: " + levelIndex  + " open");
-		else if (isInBox && requireAction && Input.GetButtonDown("Jump") && !isOpen)
-            Debug.Log("levelIndex: " + levelIndex  + " closed");
-		else if (isInBox && !requireAction)
-		{
-			save ();
-            Debug.Log("levelIndex: " + levelIndex + " no action");
-			PlayerPrefs.SetString("loadThis", "levelSelect");
-			PlayerPrefs.Save();
-			Application.LoadLevel("loading");
-//    		Application.LoadLevel("levelSelect");
-		}
-//		Debug.Log ("levelIndex: " + levelIndex+", isInBox: " + isInBox + ", isOpen: "+ isOpen + ", requireAction: " + requireAction + ", button: "+ Input.GetButtonDown("Jump"));
-        
+	
+	void Update() 
+	{
+		useKinect = PlayerPrefs.GetInt("useKinect") == 1; //1 = using the Kinect, 0 = not using the Kinect
+		
+		
+		if (((!useKinect && Input.GetKeyDown(KeyCode.Return)) || (useKinect && pmc.tookStepForward)) 
+			&& isInBox && requireAction) //if we are in the box, the door requires an action to be performed, the door is open, and we are either (not using the Kinect, press "return") or (using the kinect, with two hands out)
+			LoadWorldMap();
+		else if (isInBox && !requireAction) //we are in the box, we don't need an action, and the door is open
+           LoadWorldMap();
+
     }
 	
-	void save()
+	void LoadWorldMap()
 	{
-		PlayerPrefs.SetInt("playerLives", pProp.lives);
-		PlayerPrefs.SetInt("playerCoins", pProp.coins);
-		//set only if this is the new highest level, and not a replay
-		if (lProp.worldIndex > PlayerPrefs.GetInt("worldOfHighestLevelCompleted") || lProp.levelIndex > PlayerPrefs.GetInt("HighestLevelCompleted"))
+		int worldIndexHighest = PlayerPrefs.GetInt("worldOfHighestLevelCompleted"); 
+		int levelIndexHighest = PlayerPrefs.GetInt("highestLevelCompleted");
+		
+		if (lProp.worldIndex > 0) //ensures the world index is at least 1. False for any tutorial level
 		{
-			PlayerPrefs.SetInt("worldOfHighestLevelCompleted", lProp.worldIndex);
-			PlayerPrefs.SetInt("HighestLevelCompleted", lProp.levelIndex);
-			print ("saved level");
-		}
-		else
-			print ("replay - don't save level");
-		PlayerPrefs.Save();
-	}
-//	void Update()
-//	{
-//		//print (Input.GetButtonDown("Jump"));
-//		print (Input.anyKeyDown);
-//
-//		//print ("levelIndex: " + levelIndex+", isInBox: " + isInBox + ", isOpen: "+ isOpen + ", requireAction: " + requireAction + ", button: "+ Input.GetButtonDown("Jump"));
-//
-////		if (isInBox && !isOpen && requireAction && Input.GetButtonDown("Jump"))
-////		{
-////			print("can't go in here");
-////		}
-////		else 
-////			if (isInBox && !requireAction && isOpen)
-////		{
-////			//Application.LoadLevel(levelName);
-////			print (levelIndex + " open:" + isOpen);
-////		}
-////		else if (isInBox && requireAction && Input.GetButtonDown("Jump") && isOpen)
-////		{
-////			//Application.LoadLevel(levelName);	
-////			print (levelIndex + " open:" + isOpen);
-////		}
-////		else
-////		{
-////			print ("");
-////		}
-//	}
+			//save coin amount, lives amount, playerState
+			PlayerPrefs.SetInt("playerLives", pProp.lives);
+			PlayerPrefs.SetInt("playerCoins", pProp.coins);
+			PlayerPrefs.SetInt("playerState", (int)pProp.playerState);
 	
+			//Update the values for the highest world and level completed, only if this is the new highest level, and not a replay
+			
+			
+			if ((lProp.worldIndex == worldIndexHighest && lProp.levelIndex > levelIndexHighest) //the world index is the same, level index is greater, ie moving from level 1.4 to 1.5
+				|| lProp.worldIndex > worldIndexHighest) //the world index is greater, ignore the level index (ie, moving from level 1.5 to 2.1
+			{
+				PlayerPrefs.SetInt("worldOfHighestLevelCompleted", lProp.worldIndex);
+				PlayerPrefs.SetInt("highestLevelCompleted", lProp.levelIndex);
+			}
+			
+			
+		}
+		//else we are in a tutorial level/
+		//There are two following possibilities: 
+		//1. we are playing this tutorial without having started a game: worldIndexHighest == 0 && levelIndexHighest == 0. 
+		//	- The current PlayerPrefs can be overwritten, so set previousGameExits = 0
+		//2. we are playing this tutorial after already finishing a level in the game. worldIndexHighest != 0 && levelIndexHighest != 0
+		//  - The current PlayerPrefs can't be overwritten, so leave previousGameExits = 1
+		else if (worldIndexHighest == 0 && levelIndexHighest == 0) 
+		{
+			PlayerPrefs.SetInt("previousGameExists", 0); //no previous game exists
+		}
+		
+		PlayerPrefs.SetString("loadThis", levelName);
+		PlayerPrefs.Save();
+		Application.LoadLevel("loading"); //move to the loading screen
+	}
 }

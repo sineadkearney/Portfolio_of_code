@@ -1,236 +1,248 @@
-﻿using UnityEngine;
+﻿//Description: the controls for moving the Player. Takes input from either keyboard or the Kinect (via the PointManController)
+//Instructions: attach to the characterController for the Player
+//Based on code from http://walkerboystudio.com/html/unity_course_lab_4.html, written by Sinéad Kearney
+
+using UnityEngine;
 using System.Collections;
 
-public class playerControls : MonoBehaviour {
-	
-	public PointManController kpc; //accessed by optionsMenu
-	
-	public float  walkSpeed = 1.5f; //m  per sec, standard walk
-	public float  runSpeed  = 2.0f;
-	public float  fallSpeed = 2.0f; //falling off an object
-	public float  swimSpeed = 5.0f;
-	
-	public float  walkJump = 30.0f;
-	public float  runJump = 40.0f;
-	public float  crouchJump = 50.0f;
-	private float enhanceJumpX = 1f; //Mario jumps over (on the x-axis) more than the default
-	
-	public float  landGravityReset = 70.0f;
-	//public float  waterGravityReset = 10.0f;
-	public float  gravity = 0.0f;
-
-	
-	public float  startPos = 0.0f; //where Mario starts the level
-	public int moveDirection = 1; //which way he's facing. -1= left, 1 = right, default 1;
-	
-	
-	public AudioClip soundJump;
-	public AudioClip soundCrouchJump;		
-	public float  soundRate = 0.0f;
-	public float  soundDelay = 0.0f;
+public class PlayerControls : MonoBehaviour {
 		
-	public Vector3 velocity = new Vector3(0,0,0); //public as it is accessed by enemy.cs
+	public float crouchWalkSpeed = 5.0f;
+	public float walkSpeed = 7.0f; //m  per sec, standard walk
+	public float runSpeed  = 12.0f;
+	public float walkJumpHeight = 30.0f;
+	public float runJumpHeight = 35.0f;
+	public float changeJumpDirKinect = 5.0f; //Mario jumps over (on the x-axis) more than the default
+	public float gravity = 70.0f;	
+	public float startPos = 0.0f; //where Player starts the level
+	public int moveDirection = 1; //which way he's facing. -1= left, 1 = right, default 1. Used with the Kinect, when jumping to the right or left
+	public int KinectMoveDirection = 1; // set by the Kinect camera, 1 = right, -1 = left
+	public bool applyExternalForce = false; //true when another gameobject is pushing the player up/back. Else false.
+	public bool isFacingRight = true; //toggle for whatever direction Mario is facing	
+	public AudioClip soundJump;	
+	public Vector3 velocity = Vector3.zero; //public as it is accessed by enemy.cs
+	//and anything else that applies an external force to the player	
 	
-	
-	private bool jumpEnable = false; //only chnage when key is pressed
-	private bool runJumpEnable = false;
-	private bool crouchJumpEnable = false;
-	private bool isWalking = false;
-	private bool isRunning = false;
-	private bool isCrouching = false;
-	private bool useKinect; //toggle to use the input from the Kinect, or if false, use input from the keyboard only (for debugging)	
+	private bool isJumping = false;			//true if is currently jumping, else false
+	private bool isWalking = false;			//true if is currently walking, else false
+	private bool isRunning = false;			//true if is currently running, else false
+	private bool isCrouching = false;		//true if is currently crouching, else false
+	private bool wasCrouching = false; 		//used to compare if in the previous frame, the character was crouching (regardless of value of isCrouching)
+	private bool useKinect = false; 		//toggle to use the input from the Kinect, or if false, use input from the keyboard only (for debugging)	
+	private bool increaseJumpWidth = false; 	//increase the x-axis value of a jump when running
 	private float afterHitForceDown = 1.0f; //used when player collides with a box, etc
 	
+	private Vector3 initialControllerCenter = Vector3.zero;//the initial (x,y,z) co-ordinates of the characterController 
+	private float initialControllerHeight = 0.0f;	//the initial height of the characterController 
+	private CharacterController controller;
+	private PointManController kpc; 
+	private Animator anim;					// Reference to the player's animator component
 	
-	//new
-	public Animator anim;					// Reference to the player's animator component. Accessed when enemy dies, throwing character into the air slightly
-	public bool isFacingRight = true; //toggle for whatever direction Mario is facing
-	//public bool turnRight = false; //set by the Kinect camera. If the user is pointing right, true
-	public int KinectMoveDirection = 1; // set by the Kinect camera, 1 = right, -1 = left
-	public bool isSwimming = false;
+	//public bool isSwimming = false;
+	//public float  swimSpeed = 20.0f;
+
 	
 	void Start()
 	{
-		gravity = landGravityReset;
-		//StartCoroutine(MyMethod());
-		//add a delay to allow kinect skeleton to form?
 		anim = GetComponent<Animator>();
 		kpc = GameObject.FindWithTag("kinect-pointMan").GetComponent<PointManController>();
+		controller = GetComponent<CharacterController>();
+		initialControllerHeight = controller.height;
+		initialControllerCenter = controller.center;
+		wasCrouching = false;
 	}
+	
 	
 	
 	// Update is called once per frame
 	void Update ()
-	{
-		CharacterController controller = GetComponent<CharacterController>();	
+	{	
 		useKinect = PlayerPrefs.GetInt("useKinect") == 1; //1 = using the Kinect, 0 = not using the Kinect
 		
-		if (!isSwimming) //Mario is walking on land
+		if (!applyExternalForce) 
+			//if no external force is acting on the hero, the user is able to input movements. Else the user has to wait until the hero has landed on the grounded
 		{
-			gravity = landGravityReset;
-			//print ("isGrounded " + controller.isGrounded);
-
-			if (controller.isGrounded) //is the character controller touching the ground (collision box), or in the air
-				//TODO: when walking down a slope, isGrounded is false, but is true when stopped moving
-			{
-				//reset
-				jumpEnable = false;
-				runJumpEnable = false;
-				crouchJumpEnable = false; 
-				isCrouching = false;
-
-				startPos = transform.position.y; //this will be used when zooming the camera, to subtract from onzooming in and out 
-					
-				velocity = new Vector3(0, 0,0);
-				//if declared outside this if-statement, resets on each frame, so the y value is carried across, and Player falls very slowly
+//			if (!isSwimming) //Mario is walking on land
+//			{
+//				gravity = landGravityReset;
+//				//print ("isGrounded " + controller.isGrounded);
 				
-				if (useKinect)
+				if (controller.isGrounded) //is the character controller touching the ground (collision box), or in the air
+					//TODO: when walking down a slope, isGrounded is false, but is true when stopped moving
 				{
-					velocity.x = kpc.kinectHorz;
-					velocity.y = kpc.kinectVert;
-					
-					isWalking = kpc.isWalking;
-					isRunning = kpc.isRunning;
-				}
-				else //!useKinect
-				{
-					velocity.x = Input.GetAxis("Horizontal"); //note:  not  Vector3
-					velocity.y = Input.GetAxis("Vertical");
-					
-					isWalking = ((velocity.x < 0) || (velocity.x > 0)) && !Input.GetButton("Fire1");
-					isRunning = ((velocity.x < 0) || (velocity.x > 0)) && Input.GetButton("Fire1");
-				}
+					//reset
+					isJumping = false;
+					isCrouching = false;
+					increaseJumpWidth = false;
 				
-				 //idle by default
+					startPos = transform.position.y; //this will be used when zooming the camera, to subtract from onzooming in and out 
+						
+					//velocity = new Vector3(0, 0,0);
+					//if declared outside this if-statement, resets on each frame, so the y value is carried across, and Player falls very slowly
 					
-				//walk
-				if (isWalking)
-				{
-					velocity.x *= walkSpeed; //allows us to control speed
-				}
-				else if (isRunning)
-				{
-					velocity.x *= runSpeed; //allows us to control speed
-				}
-
-				//jump
-				if (velocity.y > 0 && isRunning)// && (useKinect || Input.GetButtonDown("Vertical")))
-				{
-					
-					velocity.y = runJump; //allows us to control speed	
-					jumpEnable = true;
-				}
-				else if (velocity.y > 0)// && (useKinect || Input.GetButtonDown("Vertical")))
-				{
-					velocity.y = walkJump;
-					jumpEnable = true;
-				}
-
-								
-				//crouch
-				//Note: if  no  skeleton  connected to Kinect,  kinectVert = -1 will be the defualt state
-				else if (velocity.y < 0 && velocity.x == 0) //have to be stopped, and if you're pushing down
-				{
-					velocity = new Vector3(0,0,0); //as long as player is crouched, can't move
-					isCrouching = true;
-				}
-				
-				//set values to select animation to play
-				anim.SetBool("Jump", jumpEnable || runJumpEnable || crouchJumpEnable);
-				anim.SetBool("Crouch", isCrouching);
-				anim.SetBool("Walking", isWalking);
-				anim.SetBool("Running", isRunning);
-	
-			}
-			else //(!controller.isGrounded)
-			{
-				if (useKinect)
-				{
-					if (kpc.jumpStraightUp)
+					if (useKinect)
 					{
-						velocity.x = 0; //jump straight up, not to a direction
+						velocity.x = kpc.kinectHorz;
+						velocity.y = kpc.kinectVert;
+						
+						isWalking = kpc.isWalking;
+						isRunning = kpc.isRunning;
 					}
-					else if (kpc.pointingDirection == 0)
+					else //!useKinect
 					{
-						//the user is not pointing in a direction
-						velocity.x = moveDirection*enhanceJumpX;
+						velocity.x = Input.GetAxis("Horizontal");
+						velocity.y = Input.GetAxis("Vertical");
+						
+						
+						isWalking = (velocity.x != 0 && !Input.GetButton("Fire1"));
+						isRunning = (velocity.x != 0 && Input.GetButton("Fire1"));
 					}
-					else
+					isCrouching = velocity.y < 0;
+					 //animation idle by default
+					
+					controller.height = initialControllerHeight;
+					controller.center = initialControllerCenter;
+				
+					//crouch
+					//Note: if  no  skeleton  connected to Kinect,  kinectVert = -1 will be the defualt state
+					if (isCrouching && !isWalking)// && velocity.x == 0) //have to be stopped, and if you're pushing down
 					{
-						velocity.x = kpc.pointingDirection*enhanceJumpX;//kpc.moveDirection;
+						if (isRunning)//you can't run while crouching, but you can walk
+						{
+							isRunning = false;
+							isWalking = true;
+						}
+						velocity.x *= crouchWalkSpeed;
+						controller.height  = (initialControllerHeight/3) * 2; //2 thirds of initial height
+					}
+					else if (isCrouching && isWalking)
+					{
+						isRunning = false; //you can't run while crouching, but you can walk
+						velocity.x *= crouchWalkSpeed;
+						controller.height  = (initialControllerHeight/3) * 2; //2 thirds of initial height
+					}
+					//walk
+					else if (isWalking)
+					{
+						velocity.x *= walkSpeed; //allows us to control speed
+					}
+					else if (isRunning)
+					{
+						velocity.x *= runSpeed; //allows us to control speed
 					}
 	
-				}
-				else //!useKinect
-				{		
-					velocity.x = Input.GetAxis("Horizontal"); //note:  not  Vector3
-					//can change the direction while in the air
-				}
 				
+					if (wasCrouching &&  !isCrouching)
+					{
+						//the player was crouching, but is no longer. We need to raise the character slightly, to prevent it from falling through the ground
+						transform.Translate(0f, 1.0f, 0f);
+					}
+					
 				
-				if (jumpEnable && moveDirection == -1) //jump left
+					//jump
+					if ((useKinect && velocity.y > 0 && isRunning) 
+					|| (!useKinect && velocity.y > 0 && Input.GetButtonDown("Vertical") && isRunning)) //have to do an additional check if !useKinect, so that hero jumps only once when "Vertical" key is held down
+					
+					{
+						AudioSource.PlayClipAtPoint(soundJump, transform.position);
+						velocity.y = runJumpHeight; //allows us to control speed
+						increaseJumpWidth = true;
+						isJumping = true;
+					}
+					if ((useKinect && velocity.y > 0) 
+					|| (!useKinect && velocity.y > 0 && Input.GetButtonDown("Vertical"))) //have to do an additional check if !useKinect, so that hero jumps only once when "Vertical" key is held down
+					{
+						AudioSource.PlayClipAtPoint(soundJump, transform.position);
+						velocity.y = walkJumpHeight;
+						isJumping = true;
+					}
+						
+					//set values to select animation to play
+					anim.SetBool("Jump", isJumping);
+					anim.SetBool("Crouch", isCrouching);
+					anim.SetBool("Walking", isWalking);
+					anim.SetBool("Running", isRunning);
+		
+				}
+				else //(!controller.isGrounded)
 				{
-					velocity.x *= walkSpeed; //can use a different walkSpeed if moving on the x-axis while jumping, is slower/faster than when walking
-				}
-				else if (jumpEnable && moveDirection == 1) //jump right
-				{
-					velocity.x *= walkSpeed; //can use a different walkSpeed if moving on the x-axis while jumping, is slower/faster than when walking
-				}
-			}
+					if (useKinect)
+					{
+						if (kpc.jumpStraightUp)
+						{
+							velocity.x = 0; //jump straight up, not to a direction
+						}
+						else if (kpc.pointingDirection == 0)
+						{
+							//the user is not pointing in a direction
+							velocity.x = moveDirection*changeJumpDirKinect;
+						}
+						else
+						{
+							velocity.x = kpc.pointingDirection*changeJumpDirKinect;//kpc.moveDirection;
+						}
+		
+					}
+					else if (!useKinect && increaseJumpWidth)
+						velocity.x = Input.GetAxis("Horizontal") * runSpeed;
+					else //!useKinect && !increaseJumpX		
+						velocity.x = Input.GetAxis("Horizontal") * walkSpeed;		
+				}				
+					
+				if (controller.collisionFlags == CollisionFlags.Above) //collision when jumping
+					velocity.y = 0 - afterHitForceDown; //apply downward force, so player doesn't hang in air					
+	
+				velocity.y -= gravity * Time.deltaTime; //grab the y-axis, gravity for going down
+//			}
+//			else //isSwimming
+//			{
+//				anim.SetBool("isSwimming", true);
+//				
+//				if (useKinect)
+//				{
+//					velocity.x = kpc.kinectHorz;
+//					velocity.y = kpc.kinectVert;
+//				}
+//				else  //!useKinect
+//				{
+//					velocity.x = Input.GetAxis("Horizontal"); //note:  not  Vector3
+//					velocity.y = Input.GetAxis("Vertical");
+//				}		
+//				velocity *= swimSpeed;
+//			}
 			
-
-			
-			if (controller.collisionFlags == CollisionFlags.Above) //collision when jumping
-			{
-				velocity.y = 0 - afterHitForceDown; //apply downward force, so player doesn't hang in air
-			}
-				
-
-			velocity.y -= gravity * Time.deltaTime; //grab the y-axis, gravity for going down
-			
-			//TODO have a check for isFalling? Make player fall faster?
-			
-		}
-		else //isSwimming
-		{
-			anim.SetBool("isSwimming", true);
-			
+			//set moveDirection so it can be compared to isFacingRight, and therefore check if the sprite needs to be flipped
 			if (useKinect)
-			{
-				velocity.x = kpc.kinectHorz;
-				velocity.y = kpc.kinectVert;
+				moveDirection = kpc.moveDirection;	
+			else {
+				//get last move direction
+				if (velocity.x < 0) {
+					moveDirection = -1;//left
+				}
+				else if (velocity.x > 0) {
+					moveDirection = 1;//right
+				}
 			}
-			else  //!useKinect
-			{
-				velocity.x = Input.GetAxis("Horizontal"); //note:  not  Vector3
-				velocity.y = Input.GetAxis("Vertical");
-			}		
-			velocity *= swimSpeed;
+			
+			
+			// If the input is moving the player right and the player is facing left...
+			// Or if the input is moving the player left and the player is facing right...
+			if((moveDirection == 1 && !isFacingRight) || (moveDirection == -1 && isFacingRight)	)
+				Flip(); //flip the player
+				
+			
 		}
-		
-		//set moveDirection so it can be compared to isFacingRight, and therefore check if the sprite needs to be flipped
-		if (useKinect)
+		else //apply external force
 		{
-			moveDirection = kpc.moveDirection;	
-		}
-		else {
-			//get last move direction
-			if (velocity.x < 0) {
-				moveDirection = -1;//left
-			}
-			else if (velocity.x > 0) {
-				moveDirection = 1;//right
-			}
+			velocity.y -= gravity * Time.deltaTime; //grab the y-axis, gravity for going down
+			if (controller.isGrounded) //is the character controller touching the ground (collision box), or in the air
+				applyExternalForce = false; //only allow for the user to change their velocity once they have landed on the ground
+			
 		}
 		
-		
-		// If the input is moving the player right and the player is facing left...
-		// Or if the input is moving the player left and the player is facing right...
-		if((moveDirection == 1 && !isFacingRight) || (moveDirection == -1 && isFacingRight)	)
-			Flip(); //flip the player
-		
-//		print("velocity: " + velocity);
-		controller.Move(velocity * Time.deltaTime); //move the controller
+		if (controller.enabled) //controller is disable when the Player dies
+			controller.Move(velocity * Time.deltaTime); //move the controller
+		wasCrouching = isCrouching;
 	}
 	
 	
@@ -244,36 +256,4 @@ public class playerControls : MonoBehaviour {
 		theScale.x *= -1;
 		transform.localScale = theScale;
 	}
-	
-	
-
-//		 private IEnumerator Wait(float seconds)
-//
-//    {
-//
-//        Debug.Log("waiting");
-//
-//        yield return new WaitForSeconds(seconds);
-//
-//        Debug.Log("wait end");
-//
-//    }
-//	
-//	void PlaySound(AudioClip soundName, float soundDelay) //name of file (soundJump), soundDelay
-//{
-//	if (!audio.isPlaying && Time.time > soundRate) 
-//	{
-//		soundRate = Time.time + soundDelay;
-//		audio.clip = soundName;
-//		audio.Play();
-//		WaitForSeconds (audio.clip.length);
-//	}
-//}
-//
-//		 IEnumerator MyMethod() {
-//    //Debug.Log("Before Waiting 2 seconds");
-//    yield return new WaitForSeconds(2);
-//    //Debug.Log("After Waiting 2 Seconds");
-//    }
 }
-

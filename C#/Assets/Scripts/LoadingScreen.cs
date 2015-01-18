@@ -1,22 +1,27 @@
-﻿using UnityEngine;
+﻿// Description: used as a loading screen inbetween loading different levels
+// Instructions: attach to an empty gameObject in a level which is used in a level with a loading screen
+//written by Sinéad Kearney
+
+using UnityEngine;
 using System.Collections;
 
 public class LoadingScreen : MonoBehaviour {
 	
-	void OnLevelWasLoaded () //run only when the level is loaded 
-	{ 
-		string test = "mainMenu";
-		if (PlayerPrefs.HasKey("loadThis"))
-		{
-			test = PlayerPrefs.GetString("loadThis");
-		}
-		print(test);
-		Application.LoadLevel(test);		
+	// Use this for initialization
+	void Start () 
+	{
+		StartCoroutine(DoThis());	
 	}
 	
-//	// Use this for initialization
-//	void Start () {
-//		
-//	
-//	}
+	IEnumerator DoThis()
+    {
+		string test = PlayerPrefs.GetString("loadThis");
+		
+		if (test == "") //PlayerPrefs.GetString failed
+			test = "mainMenu";
+		
+    	yield return new WaitForSeconds(0.5f);
+   		Application.LoadLevel(test);
+		
+    }
 }

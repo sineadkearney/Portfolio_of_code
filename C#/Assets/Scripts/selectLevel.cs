@@ -1,97 +1,81 @@
-﻿using UnityEngine;
+﻿//Description: used to select an individual level from a "level selection" area
+//Instruction: attach to a gameObject of a door/archway/etc, that contains a triggerBox.
+//written by Sinéad Kearney
+
+using UnityEngine;
 using System.Collections;
 
-public class selectLevel : MonoBehaviour {
+public class SelectLevel : MonoBehaviour {
 
-	public Sprite open;			//the sprite to be used when the door is open
-	public Sprite closed;		//the sprite to be used when the door is closed
+	public Sprite open;					//the sprite to be used when the door is open
+	public Sprite closed;				//the sprite to be used when the door is closed
 	
-	public string levelName;	//the name of the level be loaded by using this door
-	public bool requireAction;	//true if the player must perform some action to enter the door. Else false
-	public bool isOpen;			//true if the door is open.  Else false
+	public string levelName;			//the name of the level be loaded by using this door
+	public bool requireAction = false;	//true if the player must perform some action to enter the door. Else false
+	public bool isOpen = false;			//true if the door is open.  Else false
 	
-	public int linkToWorldIndex;		//the index of the world, to which levelName belongs
-	public int linkTolevelIndex;		//the index of the level, to which levelName belongs
+	public int linkToWorldIndex = 1;	//the index of the world, to which levelName belongs
+	public int linkToLevelIndex = 1;	//the index of the level, to which levelName belongs
 	
-	private bool isInBox = false; //true when player is in collision box, else false
+	private bool isInBox = false; 		//true when player is in collision box, else false
+	private bool useKinect = false;		//true if using the Kinect. Else false
+	private PointManController pmc;
+	private MenuConfirmation conMen;
+	private GameObject player;
 	
-	
-	void OnLevelWasLoaded () //run only when the level is loaded 
+	void Start() 
 	{ 
-		Start ();		
-	}
-	
-	void Start() //set the sprite to "open" or "closed"
-	{ 
-		// the door isOpen iff
-		// levelIndex is 1 ||
-		// levelIndex (eg 3) is in the range [1 -> PlayerPrefs.GetInt("HighestLevelCompleted") (eg 2) +1 ]
-		//		&& worldIndex (eg 1) is in the range [1 -> PlayerPrefs.GetInt("worldOfHighestLevelCompleted") (eg 2)]
-		// 		TODO: work on "world" later
+		pmc = GameObject.FindWithTag("kinect-pointMan").GetComponent<PointManController>();
 		
-		isOpen = linkTolevelIndex == 1 || linkTolevelIndex <= PlayerPrefs.GetInt("HighestLevelCompleted")+1;
+		isOpen = linkToLevelIndex == 1 || linkToLevelIndex <= PlayerPrefs.GetInt("highestLevelCompleted")+1;
+		//level 1 is open by default, as if we were starting a new game. Level is open if we have completed the previous level
+		//TODO: Note: this currently does not take different "worlds" into account
 		
+		player = GameObject.FindWithTag("Player");
+		conMen = GetComponent<MenuConfirmation>();
+		conMen.enabled = false;
+		
+		//set the sprite to "open" or "closed"
 		if (isOpen)
-		{
 			GetComponent<SpriteRenderer>().sprite = open;
-			print (linkTolevelIndex +" open " + isOpen);
-		}
 		else
-		{
 			GetComponent<SpriteRenderer>().sprite = closed;
-			print (linkTolevelIndex + " closed " + isOpen);
-		}
+
 	}
 	
 	void OnTriggerEnter (Collider other)
 	{
-		if (other.tag == "Player")
-		{
-				isInBox = true;
-//			print ("open: " + isOpen);
-		}
-		
+		if (other.tag == "Player" || other.transform.IsChildOf(player.transform))
+			isInBox = true;	
 	}
+	
 	void OnTriggerExit (Collider other)
 	{
-		if (other.tag == "Player")
-		{
-				isInBox = false;
-//			print ("open: " + isOpen);
-		}
-		
+		if (other.tag == "Player" || other.transform.IsChildOf(player.transform))
+			isInBox = false;		
 	}
 	
-	void Update() {
-		if (isInBox && requireAction && Input.GetButtonDown("Jump") && isOpen && levelName.Equals("quitToMenu"))
-		{
-//            Debug.Log("delete all playerPrefs and go to main menu");
-//			PlayerPrefs.DeleteAll();
-			Application.LoadLevel("mainMenu");
-		}
-        else if (isInBox && requireAction && Input.GetButtonDown("Jump") && isOpen)
-		{
-            Debug.Log("load: " + levelName  + " open");
-			//Application.LoadLevel(levelName);
-			loadLevel (levelName);
-		}
-		else if (isInBox && requireAction && Input.GetButtonDown("Jump") && !isOpen)
-            Debug.Log("load: " + levelName  + " closed");
-		else if (isInBox && !requireAction)
-		{
-            Debug.Log("load: " + levelName  + " no action");
-			//Application.LoadLevel(levelName);
-			loadLevel (levelName);
-		}
-//		Debug.Log ("levelIndex: " + levelIndex+", isInBox: " + isInBox + ", isOpen: "+ isOpen + ", requireAction: " + requireAction + ", button: "+ Input.GetButtonDown("Jump"));
-        
+	void Update() 
+	{
+		useKinect = PlayerPrefs.GetInt("useKinect") == 1; //1 = using the Kinect, 0 = not using the Kinect
+		
+		
+		if (((!useKinect && Input.GetKeyDown(KeyCode.Return)) || (useKinect && pmc.tookStepForward)) 
+			&& isInBox && requireAction  && isOpen) //if we are in the box, the door requires an action to be performed, the door is open, and we are either (not using the Kinect, press "return") or (using the kinect, with two hands out)
+			ConfirmChoice(levelName);
+		else if (isInBox && !requireAction  && isOpen) //we are in the box, we don't need an action, and the door is open
+            ConfirmChoice(levelName);
+
     }
 	
-	void loadLevel(string level)
+	void ConfirmChoice(string level)
 	{
+		GameObject.FindWithTag("hud").GetComponent<HudController>().enabled = false; 
+		//the hudController is listening for a "pause" to be spoken by the user. 
+		//Disable this, because the confirmation menu must be accessible via voice.
 		PlayerPrefs.SetString("loadThis", level);
 		PlayerPrefs.Save();
-		Application.LoadLevel("loading");
+		Time.timeScale = 0.00000001f; //pause game
+		conMen.enabled = true;
 	}
-
 }
