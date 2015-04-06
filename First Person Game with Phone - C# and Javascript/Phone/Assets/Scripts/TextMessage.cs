@@ -7,8 +7,8 @@ public class TextMessage {
 	private long m_timestamp = 0;
 	private string m_sender = "";
 	private string m_message = "";
-	public bool read = false;
-	public bool selected = false;
+	public bool m_read = false;
+	public bool m_selected = false;
 
 	public TextMessage(string sender, string message)
 	{
@@ -26,6 +26,8 @@ public class TextMessage {
         m_sender = str.Substring(0, str.IndexOf (", ")-1);
         str = str.Substring(str.IndexOf (": ") + 3);
         m_message = str.Substring(0, str.IndexOf ("\"}"));
+		m_read = false;
+		m_selected = false;
 	}
 
 	public long GetTimestamp()
@@ -53,6 +55,4 @@ public class TextMessage {
 		string str = "{\"timestamp\": " + m_timestamp + ", \"sender\": \"" + m_sender + "\", \"message\": \"" + m_message + "\"}";
 		return str;
 	}
-
-
 }

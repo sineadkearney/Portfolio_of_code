@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using System;
+using System.Diagnostics;
 
 public class CanvasScript : MonoBehaviour {
 	
@@ -124,9 +125,17 @@ public class CanvasScript : MonoBehaviour {
 
 	public void SetScreenText(string content)
 	{
+		StackFrame fr = new StackFrame(1,true);
+		StackTrace st = new StackTrace(fr);
+		UnityEngine.Debug.Log (st.ToString ());
+		UnityEngine.Debug.Log ("SetScreenText, content: " + content);
 		//ResetAllLines();
 		screenText.text = content;
 		//screenText.color = new Color (0, 0, 1, 1);
 	}
 
+	public void SetMessageIconText(string content)
+	{
+		messageIconText.text = content;
+	}
 }
