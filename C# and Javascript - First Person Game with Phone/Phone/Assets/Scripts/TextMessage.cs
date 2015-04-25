@@ -55,4 +55,6 @@ public class TextMessage {
 		string str = "{\"timestamp\": " + m_timestamp + ", \"sender\": \"" + m_sender + "\", \"message\": \"" + m_message + "\"}";
 		return str;
 	}
+
+
 }

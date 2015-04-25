@@ -19,6 +19,9 @@ public class CanvasScript : MonoBehaviour {
 	public Text LineText5;
 	public Text LineText6;
 
+	public Text navTextLeft;
+	public Text navTextRight;
+
 	private string senderStart = "";
 	private string timeStart = "";
 
@@ -27,7 +30,7 @@ public class CanvasScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		Screen.SetResolution(380, 550, false);
+		Screen.SetResolution(420, 600, false);
 	}
 	
 	// Update is called once per frame
@@ -91,10 +94,20 @@ public class CanvasScript : MonoBehaviour {
 		}
 	}
 
+	public void SetNavLeftText(string str)
+	{
+		navTextLeft.text = str;
+	}
+
+	public void SetNavRightText(string str)
+	{
+		navTextRight.text = str;
+	}
+
 	void SetLineSelected(Text text, bool isSelected)
 	{
 		if(isSelected) 
-			text.color = new Color(1,0,0,1);
+			text.color = new Color(1,1,1,1);
 		else
 			text.color = new Color(0,0,0,1);
 	}
