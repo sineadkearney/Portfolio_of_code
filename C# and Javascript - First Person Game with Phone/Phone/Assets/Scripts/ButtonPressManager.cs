@@ -94,11 +94,19 @@ public class ButtonPressManager : MonoBehaviour {
 		case PhoneState.State.TextMessageMenu:
 			if (btn == Button.Enter)
 			{
-				ps.SetViewToTextMessageInbox();
+				ps.SetViewToTextMessageCollection();
 			}
 			else if (btn == Button.Cancel)
 			{
 				ps.SetViewToMainMenu();
+			}
+			else if (btn == Button.Up)
+			{
+				ps.TextMessMenuScrollUp();
+			}
+			else if (btn == Button.Down)
+			{
+				ps.TextMessMenuScrollDown();
 			}
 			break;
 			
@@ -120,12 +128,30 @@ public class ButtonPressManager : MonoBehaviour {
 				ps.InboxScrollDown();
 			}
 			break;
+		case PhoneState.State.TextMessageOutbox:
+			if (btn == Button.Enter)
+			{
+				ps.ReadSelectedOutboxText();
+			}
+			else if ( btn == Button.Cancel)
+			{
+				ps.SetViewToTextMessageMenu();
+			}
+			else if (btn == Button.Up)
+			{
+				ps.InboxScrollUp();
+			}
+			else if (btn == Button.Down)
+			{
+				ps.InboxScrollDown();
+			}
+			break;
 			
 		case PhoneState.State.TextMessageDisplay:
 			
 			if (btn == Button.Cancel)
 			{
-				ps.SetViewToTextMessageInbox();
+				ps.SetViewToTextMessageCollection();
 			}
 			else if (btn == Button.Enter)
 			{

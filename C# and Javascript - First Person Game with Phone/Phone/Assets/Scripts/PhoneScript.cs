@@ -14,13 +14,18 @@ public class PhoneScript : MonoBehaviour {
 	private string homeScreenTextContent;
 
 	private TextMessageCollection inboxTexts;
+	private TextMessageCollection outboxTexts;
 
 	public bool hasUnreadTexts = false;
+
+	private TextMessageMenu tmm;
 
 	// Use this for initialization
 	void Start () {
 
+		tmm = new TextMessageMenu();
 		inboxTexts = new TextMessageCollection ();
+		outboxTexts = new TextMessageCollection ();
 
 		cs = (CanvasScript) canvas.GetComponent<CanvasScript>();
 		cs.ResetAllLines ();
@@ -40,8 +45,27 @@ public class PhoneScript : MonoBehaviour {
 		inboxTexts.HandleNewIncomingText(txt6);*/
 
 		inboxTexts.SetUpperIndexTextInViewToTop();
+		TextMessageMenu.SetState (TextMessageMenu.TextMessageMenuState.Inbox);
 		SetViewToHomeScreen ();
 		numberOnScreen = "\n\n";
+
+		ContactsCollection cc = new ContactsCollection ();
+
+		Contact c5 = new Contact ("name5", "1234");
+		cc.AddContactToContacts (c5);
+		Contact c1 = new Contact ("name2", "1234");
+		cc.AddContactToContacts (c1);
+		Contact c4 = new Contact ("name4", "1234");
+		cc.AddContactToContacts (c4);
+		Contact c2 = new Contact ("name1", "1234");
+		cc.AddContactToContacts (c2);
+		Contact c3 = new Contact ("abc", "1234");
+		cc.AddContactToContacts (c3);
+		Contact c7 = new Contact ("name7", "1234");
+		cc.AddContactToContacts (c7);
+		Contact c6 = new Contact ("name6", "1234");
+		cc.AddContactToContacts (c6);
+		cc.Print ();
 	}
 
 	// Update is called once per frame
@@ -109,7 +133,6 @@ public class PhoneScript : MonoBehaviour {
 	public void SetViewToHomeScreen()
 	{
 		PhoneState.SetState(PhoneState.State.HomeScreen);
-		Debug.Log (homeScreenTextContent);
 		cs.SetScreenText("\n" + homeScreenTextContent);
 		cs.SetHeadingText("Home");
 		cs.SetNavLeftText ("");
@@ -127,21 +150,41 @@ public class PhoneScript : MonoBehaviour {
 
 	public void SetViewToTextMessageMenu()
 	{
-		PhoneState.SetState(PhoneState.State.TextMessageMenu);
-		cs.SetScreenText("\n\nGo to Inbox?");
-		cs.SetHeadingText("Message Menu");
-		cs.SetNavLeftText ("Back");
-		cs.SetNavRightText ("Go");
+		tmm.SetView ();
 	}
 
-	public void SetViewToTextMessageInbox()
+	public void TextMessMenuScrollUp()
 	{
-		inboxTexts.SetViewToTextMessageCollection ();
+		tmm.ScrollUp ();
+	}
+
+	public void TextMessMenuScrollDown()
+	{
+		tmm.ScrollDown ();
+	}
+
+	public void SetViewToTextMessageCollection()
+	{
+		if (TextMessageMenu.GetState() == TextMessageMenu.TextMessageMenuState.Inbox)
+		{
+			PhoneState.SetState (PhoneState.State.TextMessageInbox);
+			inboxTexts.SetViewToTextMessageCollection ();
+		}
+		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Outbox)
+		{
+			PhoneState.SetState (PhoneState.State.TextMessageOutbox);
+			outboxTexts.SetViewToTextMessageCollection ();
+		}
 	}
 
 	public void ReadSelectedInboxText()
 	{
 		inboxTexts.ReadSelectedText ();
+	}
+
+	public void ReadSelectedOutboxText()
+	{
+		outboxTexts.ReadSelectedText ();
 	}
 
 	public void DeleteSelectedInboxText()

@@ -140,11 +140,7 @@ public class CanvasScript : MonoBehaviour {
 	{
 		StackFrame fr = new StackFrame(1,true);
 		StackTrace st = new StackTrace(fr);
-		UnityEngine.Debug.Log (st.ToString ());
-		UnityEngine.Debug.Log ("SetScreenText, content: " + content);
-		//ResetAllLines();
 		screenText.text = content;
-		//screenText.color = new Color (0, 0, 1, 1);
 	}
 
 	public void SetMessageIconText(string content)

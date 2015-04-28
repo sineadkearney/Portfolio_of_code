@@ -30,7 +30,6 @@ public class TextMessageCollection : ScriptableObject {
 	public void HandleNewIncomingText(TextMessage text)
 	{
 		AddTextToTexts(text);
-		Debug.Log ("textsLength: " + textsLength);
 		ps.hasUnreadTexts = true;
 		ps.HandleHasUnreadMessages();
 		SetUpperIndexTextInViewToTop ();
@@ -100,8 +99,6 @@ public class TextMessageCollection : ScriptableObject {
 
 	public void SetViewToTextMessageCollection()
 	{
-		PhoneState.SetState(PhoneState.State.TextMessageInbox);
-		
 		int index = 1;
 		int count = 0;
 		ps.hasUnreadTexts = false;

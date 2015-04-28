@@ -10,6 +10,7 @@ public class PhoneState: ScriptableObject {
 		MainMenu,
 		TextMessageMenu,
 		TextMessageInbox,
+		TextMessageOutbox,
 		TextMessageDisplay,
 		TextMessageOptions,
 	};
