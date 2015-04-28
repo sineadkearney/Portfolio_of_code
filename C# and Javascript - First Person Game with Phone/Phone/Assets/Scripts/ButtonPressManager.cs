@@ -89,6 +89,14 @@ public class ButtonPressManager : MonoBehaviour {
 			{
 				ps.SetViewToHomeScreen();
 			}
+			else if (btn == Button.Up)
+			{
+				ps.MainMenuScrollUp();
+			}
+			else if (btn == Button.Down)
+			{
+				ps.MainMenuScrollDown();
+			}
 			break;
 			
 		case PhoneState.State.TextMessageMenu:

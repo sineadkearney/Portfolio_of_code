@@ -19,11 +19,14 @@ public class PhoneScript : MonoBehaviour {
 	public bool hasUnreadTexts = false;
 
 	private TextMessageMenu tmm;
+	private MainMenu mm;
 
 	// Use this for initialization
 	void Start () {
 
 		tmm = new TextMessageMenu();
+		mm = new MainMenu ();
+
 		inboxTexts = new TextMessageCollection ();
 		outboxTexts = new TextMessageCollection ();
 
@@ -45,6 +48,7 @@ public class PhoneScript : MonoBehaviour {
 		inboxTexts.HandleNewIncomingText(txt6);*/
 
 		inboxTexts.SetUpperIndexTextInViewToTop();
+		MainMenu.SetState (MainMenu.MainMenuState.Messages);
 		TextMessageMenu.SetState (TextMessageMenu.TextMessageMenuState.Inbox);
 		SetViewToHomeScreen ();
 		numberOnScreen = "\n\n";
@@ -141,11 +145,22 @@ public class PhoneScript : MonoBehaviour {
 
 	public void SetViewToMainMenu()
 	{
-		PhoneState.SetState(PhoneState.State.MainMenu);
-		cs.SetScreenText("\n\nGo to Messages?");
-		cs.SetHeadingText("Main Menu");
-		cs.SetNavLeftText ("Back");
-		cs.SetNavRightText ("Go");
+		mm.SetView ();
+		//PhoneState.SetState(PhoneState.State.MainMenu);
+		//cs.SetScreenText("\n\nGo to Messages?");
+		//cs.SetHeadingText("Main Menu");
+		//cs.SetNavLeftText ("Back");
+		//cs.SetNavRightText ("Go");
+	}
+
+	public void MainMenuScrollUp()
+	{
+		mm.ScrollUp ();
+	}
+
+	public void MainMenuScrollDown()
+	{
+		mm.ScrollDown ();
 	}
 
 	public void SetViewToTextMessageMenu()
