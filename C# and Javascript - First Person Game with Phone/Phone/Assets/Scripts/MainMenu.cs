@@ -14,7 +14,7 @@ public class MainMenu : ScriptableObject {
 	private PhoneScript ps = (PhoneScript)GameObject.FindGameObjectWithTag("Phone").GetComponent<PhoneScript>();
 	private CanvasScript cs = (CanvasScript)GameObject.FindGameObjectWithTag ("PhoneCanvas").GetComponent<CanvasScript> ();
 	
-	public static MainMenuState GetState()
+	public MainMenuState GetState()
 	{
 		return mainMenuState;
 	}

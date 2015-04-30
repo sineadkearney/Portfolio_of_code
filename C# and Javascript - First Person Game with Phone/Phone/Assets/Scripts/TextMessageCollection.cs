@@ -57,7 +57,8 @@ public class TextMessageCollection : ScriptableObject {
 		upperIndexTextInView = textsLength - 1;
 	}
 
-	void AddTextToTexts(TextMessage text)
+	//TODO: allows me to add to output. Find a better way to do this.
+	public void AddTextToTexts(TextMessage text)
 	{
 		texts.Insert (0, text);
 		textsLength += 1;

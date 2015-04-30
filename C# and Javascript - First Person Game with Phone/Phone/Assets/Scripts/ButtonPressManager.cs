@@ -45,6 +45,7 @@ public class ButtonPressManager : MonoBehaviour {
 		cs.SetScreenText ("");
 
 		PhoneState.State state = PhoneState.GetState ();
+		Debug.Log ("state: " + state + " btn: " + btn);
 		switch (state)
 		{
 		
@@ -83,7 +84,7 @@ public class ButtonPressManager : MonoBehaviour {
 		case PhoneState.State.MainMenu:
 			if (btn == Button.Enter)
 			{
-				ps.SetViewToTextMessageMenu();
+				ps.SetViewToSubMainMenu();
 			}
 			else if (btn == Button.Cancel)
 			{
@@ -125,7 +126,7 @@ public class ButtonPressManager : MonoBehaviour {
 			}
 			else if ( btn == Button.Cancel)
 			{
-				ps.SetViewToTextMessageMenu();
+				ps.SetViewToSubMainMenu();
 			}
 			else if (btn == Button.Up)
 			{
@@ -143,7 +144,7 @@ public class ButtonPressManager : MonoBehaviour {
 			}
 			else if ( btn == Button.Cancel)
 			{
-				ps.SetViewToTextMessageMenu();
+				ps.SetViewToSubMainMenu();
 			}
 			else if (btn == Button.Up)
 			{
@@ -176,6 +177,26 @@ public class ButtonPressManager : MonoBehaviour {
 			else if (btn == Button.Cancel)
 			{
 				ps.ReadSelectedInboxText();
+			}
+			break;
+
+		case PhoneState.State.ContactsList:
+			if (btn == Button.Enter)
+			{
+				//ps.ReadSelectedOutboxText();
+				Debug.Log ("enter");
+			}
+			else if ( btn == Button.Cancel)
+			{
+				ps.SetViewToMainMenu();
+			}
+			else if (btn == Button.Up)
+			{
+				ps.ContactsScrollUp();
+			}
+			else if (btn == Button.Down)
+			{
+				ps.ContactsScrollDown();
 			}
 			break;
 			

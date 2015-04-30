@@ -13,6 +13,7 @@ public class PhoneState: ScriptableObject {
 		TextMessageOutbox,
 		TextMessageDisplay,
 		TextMessageOptions,
+		ContactsList,
 	};
 
 	private static PhoneState.State state;

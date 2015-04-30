@@ -3,33 +3,43 @@ using System.Collections;
 
 public class Contact : ScriptableObject {
 
-	private string name;
-	private string number;
+	private string m_name;
+	private string m_number;
+	private bool m_selected = false;
 
 	public Contact(string newName, string newNumber)
 	{
-		name = newName;
-		number = newNumber;
+		m_name = newName;
+		m_number = newNumber;
 	}
 
 	public string GetName()
 	{
-		return name;
+		return m_name;
 	}
 
 	public void SetName(string newName)
 	{
-		name = newName;
+		m_name = newName;
 	}
 
 	public string GetNumber()
 	{
-		return number;
+		return m_number;
 	}
 
 	public void SetNumber(string newNumber)
 	{
-		number = newNumber;
+		m_number = newNumber;
 	}
 
+	public bool IsSelected()
+	{
+		return m_selected;
+	}
+
+	public void SetSelected(bool selected)
+	{
+		m_selected = selected;
+	}
 }
