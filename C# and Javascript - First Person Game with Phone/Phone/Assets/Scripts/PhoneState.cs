@@ -14,9 +14,12 @@ public class PhoneState: ScriptableObject {
 		TextMessageDisplay,
 		TextMessageOptions,
 		ContactsList,
+		ErrorMessage,
 	};
 
 	private static PhoneState.State state;
+	private static PhoneState.State prevState;
+
 	// Use this for initialization
 	void Start () {
 		state = State.HomeScreen;
@@ -29,8 +32,15 @@ public class PhoneState: ScriptableObject {
 	
 	public static void SetState(State newState)
 	{
+		prevState = state;
 		state = newState;
 	}
+
+	public static State GetPrevState()
+	{
+		return prevState;
+	}
+
 }
 
 

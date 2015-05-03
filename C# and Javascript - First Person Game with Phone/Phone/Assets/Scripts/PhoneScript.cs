@@ -32,20 +32,10 @@ public class PhoneScript : MonoBehaviour {
 		outboxTexts = new TextMessageCollection ();
 
 		cc = new ContactsCollection ();	
-		Contact c5 = new Contact ("name5", "1234");
-		cc.AddContactToContacts (c5);
-		Contact c1 = new Contact ("name2", "1235");
-		cc.AddContactToContacts (c1);
-		Contact c4 = new Contact ("name4", "1236");
-		cc.AddContactToContacts (c4);
-		Contact c2 = new Contact ("name1", "1237");
-		cc.AddContactToContacts (c2);
-		Contact c3 = new Contact ("abc", "1238");
-		cc.AddContactToContacts (c3);
-		Contact c7 = new Contact ("name7", "1239");
-		cc.AddContactToContacts (c7);
-		Contact c6 = new Contact ("name6", "1244");
-		cc.AddContactToContacts (c6);
+		cc.LoadSavedContacts ();
+
+		//Contact c5 = new Contact ("lisa", "1234567");
+		//cc.AddContactToContacts (c5, true);
 
 		cs = (CanvasScript) canvas.GetComponent<CanvasScript>();
 		cs.ResetAllLines ();
@@ -55,20 +45,20 @@ public class PhoneScript : MonoBehaviour {
 		TextMessage txt2 = new TextMessage (cc.GetSenderFromNumber("1235"), "content");
 		inboxTexts.HandleNewIncomingText(txt2);
 	
-		TextMessage txt3 = new TextMessage (cc.GetSenderFromNumber("1236"), "content");
+		/*TextMessage txt3 = new TextMessage (cc.GetSenderFromNumber("1236"), "content");
 		inboxTexts.HandleNewIncomingText(txt3);
 		TextMessage txt4 = new TextMessage (cc.GetSenderFromNumber("1237"), "content");
 		inboxTexts.HandleNewIncomingText(txt4);
 		TextMessage txt5 = new TextMessage (cc.GetSenderFromNumber("1238"), "content");
 		inboxTexts.HandleNewIncomingText(txt5);
 		TextMessage txt6 = new TextMessage (cc.GetSenderFromNumber("0000"), "content");
-		inboxTexts.HandleNewIncomingText(txt6);
+		inboxTexts.HandleNewIncomingText(txt6);*/
 
 		inboxTexts.SetUpperIndexTextInViewToTop();
 		MainMenu.SetState (MainMenu.MainMenuState.Messages);
 		TextMessageMenu.SetState (TextMessageMenu.TextMessageMenuState.Inbox);
 		SetViewToHomeScreen ();
-		numberOnScreen = "\n\n";
+		numberOnScreen = "";
 
 		TextMessage outText = new TextMessage ("me", "my text message");
 		outboxTexts.AddTextToTexts(outText);
@@ -118,15 +108,37 @@ public class PhoneScript : MonoBehaviour {
 
 	public void UpdateNumberOnScreen()
 	{
-		if (numberOnScreen == "\n\n")
+		if (numberOnScreen == "")
 		{
 			SetViewToHomeScreen();
 		}
 		else
 		{
-			cs.SetScreenText(numberOnScreen);
+			cs.SetHeadingText("Home");
+			cs.SetLineContent(2, numberOnScreen, false);
+			cs.SetScreenText("");
+			cs.SetNavLeftText("Delete");
+			cs.SetNavRightText("Save");
 			PhoneState.SetState (PhoneState.State.NumberOnScreen);
 		}
+	}
+
+	public void SaveNumberOnScreenToContacts()
+	{
+		string name = "test"; //TODO: hardcoded for now
+		SaveNewContact (name, numberOnScreen);
+		numberOnScreen = "";
+		UpdateNumberOnScreen ();
+	}
+
+	private void SaveNewContact (string name, string number)
+	{
+		Contact c = new Contact (name, number);
+		cc.AddContactToContacts (c, true);
+
+//		Contact c5 = ScriptableObject.CreateInstance("Contact") as Contact;
+//		c5.DataInit(name, number);
+//		cc.AddContactToContacts (c5);
 	}
 
 	void UpdateHomeScreen()
@@ -135,6 +147,12 @@ public class PhoneScript : MonoBehaviour {
 		{
 			cs.SetScreenText(numberOnScreen);
 		}
+	}
+
+	public void ResetAndSetViewToHomeScreen()
+	{
+		numberOnScreen = "";
+		SetViewToHomeScreen ();
 	}
 
 	public void SetViewToHomeScreen()
@@ -236,4 +254,67 @@ public class PhoneScript : MonoBehaviour {
 	{
 		cc.ScrollDown ();
 	}
+
+	public void HandleOutGoingCall()
+	{
+		ShowErrorMessage("You have no credit");
+	}
+
+	public void ShowErrorMessage(string content)
+	{
+		PhoneState.SetState(PhoneState.State.ErrorMessage);
+		cs.SetScreenText("\n" + content);
+		cs.SetHeadingText("Error");
+		cs.SetNavLeftText ("Back");
+		cs.SetNavRightText ("");
+	}
+
+	//used after clicking cancel from an error message
+	public void SetViewBasedOnState()
+	{
+		PhoneState.State state = PhoneState.GetState ();
+		Debug.Log (state);
+		switch (state)
+		{
+			
+		case PhoneState.State.HomeScreen:
+				SetViewToHomeScreen();
+			break;			
+		case PhoneState.State.NumberOnScreen:
+			UpdateNumberOnScreen();
+			break;
+			
+		case PhoneState.State.MainMenu:
+			SetViewToMainMenu();
+			break;
+			
+		case PhoneState.State.TextMessageMenu:
+			SetViewToSubMainMenu();
+			break;
+			
+		case PhoneState.State.TextMessageInbox:
+		case PhoneState.State.TextMessageOutbox:
+			SetViewToTextMessageCollection();
+			break;
+			
+		case PhoneState.State.TextMessageDisplay:
+		//either outbox or inbox...
+			break;
+			
+		case PhoneState.State.TextMessageOptions:
+			//either outbox or inbox SetViewToInboxTextMessageOptions()
+			break;
+			
+		case PhoneState.State.ContactsList:
+			SetViewToSubMainMenu();
+			break;
+		case PhoneState.State.ErrorMessage:
+			break;
+		default:
+			print ("Incorrect state.");
+			break;
+		}
+	}
+
+
 }

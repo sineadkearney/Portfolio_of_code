@@ -1,13 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Contact : ScriptableObject {
+public class Contact : MonoBehaviour {
 
 	private string m_name;
 	private string m_number;
 	private bool m_selected = false;
 
 	public Contact(string newName, string newNumber)
+	{
+		m_name = newName;
+		m_number = newNumber;
+	}
+
+	public void DataInit(string newName, string newNumber)
 	{
 		m_name = newName;
 		m_number = newNumber;

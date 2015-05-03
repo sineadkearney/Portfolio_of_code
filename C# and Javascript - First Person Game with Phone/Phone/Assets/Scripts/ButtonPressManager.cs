@@ -19,6 +19,10 @@ public class ButtonPressManager : MonoBehaviour {
 		Enter,
 		Up,
 		Down,
+		Left,
+		Right,
+		Answer,
+		HangUp,
 		Star,
 		Hash,
 	}
@@ -79,6 +83,18 @@ public class ButtonPressManager : MonoBehaviour {
 				ps.UpdateNumberOnScreen();
 
 			}
+			else if (btn == Button.Answer)
+			{
+				ps.HandleOutGoingCall();
+			}
+			else if (btn == Button.Enter)
+			{
+				ps.SaveNumberOnScreenToContacts();
+			}
+			else if (btn == Button.HangUp)
+			{
+				ps.ResetAndSetViewToHomeScreen();
+			}
 			break;
 			
 		case PhoneState.State.MainMenu:
@@ -97,6 +113,10 @@ public class ButtonPressManager : MonoBehaviour {
 			else if (btn == Button.Down)
 			{
 				ps.MainMenuScrollDown();
+			}
+			else if (btn == Button.HangUp)
+			{
+				ps.ResetAndSetViewToHomeScreen();
 			}
 			break;
 			
@@ -117,6 +137,10 @@ public class ButtonPressManager : MonoBehaviour {
 			{
 				ps.TextMessMenuScrollDown();
 			}
+			else if (btn == Button.HangUp)
+			{
+				ps.ResetAndSetViewToHomeScreen();
+			}
 			break;
 			
 		case PhoneState.State.TextMessageInbox:
@@ -136,6 +160,10 @@ public class ButtonPressManager : MonoBehaviour {
 			{
 				ps.InboxScrollDown();
 			}
+			else if (btn == Button.HangUp)
+			{
+				ps.ResetAndSetViewToHomeScreen();
+			}
 			break;
 		case PhoneState.State.TextMessageOutbox:
 			if (btn == Button.Enter)
@@ -154,6 +182,10 @@ public class ButtonPressManager : MonoBehaviour {
 			{
 				ps.InboxScrollDown();
 			}
+			else if (btn == Button.HangUp)
+			{
+				ps.ResetAndSetViewToHomeScreen();
+			}
 			break;
 			
 		case PhoneState.State.TextMessageDisplay:
@@ -166,6 +198,10 @@ public class ButtonPressManager : MonoBehaviour {
 			{
 				ps.SetViewToInboxTextMessageOptions();
 			}
+			else if (btn == Button.HangUp)
+			{
+				ps.ResetAndSetViewToHomeScreen();
+			}
 			break;
 			
 		case PhoneState.State.TextMessageOptions:
@@ -177,6 +213,10 @@ public class ButtonPressManager : MonoBehaviour {
 			else if (btn == Button.Cancel)
 			{
 				ps.ReadSelectedInboxText();
+			}
+			else if (btn == Button.HangUp)
+			{
+				ps.ResetAndSetViewToHomeScreen();
 			}
 			break;
 
@@ -198,8 +238,18 @@ public class ButtonPressManager : MonoBehaviour {
 			{
 				ps.ContactsScrollDown();
 			}
+			else if (btn == Button.HangUp)
+			{
+				ps.ResetAndSetViewToHomeScreen();
+			}
 			break;
-			
+		case PhoneState.State.ErrorMessage:
+			if (btn == Button.Cancel)
+			{
+				PhoneState.SetState(PhoneState.GetPrevState());
+				ps.SetViewBasedOnState();
+			}
+			break;
 		default:
 			print ("Incorrect state.");
 			break;
