@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PhoneState: ScriptableObject {
+public class PhoneState {
 
 	public enum State
 	{

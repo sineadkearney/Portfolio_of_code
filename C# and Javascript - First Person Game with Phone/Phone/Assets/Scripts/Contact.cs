@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Contact : MonoBehaviour {
+public class Contact {
 
 	private string m_name;
 	private string m_number;

@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class MainMenu : ScriptableObject {
+public class MainMenu {
 
 	public enum MainMenuState
 	{

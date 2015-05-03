@@ -14,69 +14,67 @@ public class PhoneScript : MonoBehaviour {
 	private string homeScreenTextContent;
 
 	private TextMessageCollection inboxTexts;
+	private string inboxTextsJson = "C:\\Users\\Sinead\\Documents\\Phone\\Assets\\savedData\\inboxTexts.json";
 	private TextMessageCollection outboxTexts;
+	private string outboxTextsJson = "C:\\Users\\Sinead\\Documents\\Phone\\Assets\\savedData\\outboxTexts.json";
 
 	public bool hasUnreadTexts = false;
 
 	private TextMessageMenu tmm;
 	private MainMenu mm;
-	private ContactsCollection cc;
+	public ContactsCollection cc;
 
 	// Use this for initialization
+	//TurnOnPhone()
 	void Start () {
+
+		cs = (CanvasScript) canvas.GetComponent<CanvasScript>();
+		cs.ResetAllLines ();
 
 		tmm = new TextMessageMenu();
 		mm = new MainMenu ();
 
-		inboxTexts = new TextMessageCollection ();
-		outboxTexts = new TextMessageCollection ();
+		inboxTexts = new TextMessageCollection (inboxTextsJson, TextMessageCollection.CollectionType.Inbox);
+		outboxTexts = new TextMessageCollection (outboxTextsJson, TextMessageCollection.CollectionType.Outbox);
 
 		cc = new ContactsCollection ();	
 		cc.LoadSavedContacts ();
 
+		//example of adding a new contact
 		//Contact c5 = new Contact ("lisa", "1234567");
 		//cc.AddContactToContacts (c5, true);
 
-		cs = (CanvasScript) canvas.GetComponent<CanvasScript>();
-		cs.ResetAllLines ();
-		HandleHasUnreadMessages ();
-		TextMessage txt1 = new TextMessage (cc.GetSenderFromNumber("1234"), "content");
-		inboxTexts.HandleNewIncomingText(txt1);
-		TextMessage txt2 = new TextMessage (cc.GetSenderFromNumber("1235"), "content");
-		inboxTexts.HandleNewIncomingText(txt2);
-	
-		/*TextMessage txt3 = new TextMessage (cc.GetSenderFromNumber("1236"), "content");
-		inboxTexts.HandleNewIncomingText(txt3);
-		TextMessage txt4 = new TextMessage (cc.GetSenderFromNumber("1237"), "content");
-		inboxTexts.HandleNewIncomingText(txt4);
-		TextMessage txt5 = new TextMessage (cc.GetSenderFromNumber("1238"), "content");
-		inboxTexts.HandleNewIncomingText(txt5);
-		TextMessage txt6 = new TextMessage (cc.GetSenderFromNumber("0000"), "content");
-		inboxTexts.HandleNewIncomingText(txt6);*/
+		//example of adding a new inbox text
+		//TextMessage txt1 = new TextMessage ("1234", "content txt1");
+		//inboxTexts.HandleNewIncomingText(txt1, true);
 
-		inboxTexts.SetUpperIndexTextInViewToTop();
 		MainMenu.SetState (MainMenu.MainMenuState.Messages);
 		TextMessageMenu.SetState (TextMessageMenu.TextMessageMenuState.Inbox);
-		SetViewToHomeScreen ();
 		numberOnScreen = "";
 
-		TextMessage outText = new TextMessage ("me", "my text message");
-		outboxTexts.AddTextToTexts(outText);
+		HandleHasUnreadMessages ();
+		SetViewToHomeScreen ();
+
+		//example of adding a new outbox text
+		//TextMessage outText = new TextMessage ("me", "my text message");
+		//outboxTexts.AddTextToTexts(outText);
 
 	}
 
 	// Update is called once per frame
-	void Update () {
+	//void Update () {
 	
-	}
+	//}
 
 	[RPC]
 	void UpdateText(string content)
 	{
 		TextMessage text = new TextMessage (content);
-		inboxTexts.HandleNewIncomingText(text);
+		inboxTexts.HandleNewIncomingText(text, true);
 	}
 
+	//if in the main menu, show a message that we have a new text/have no new texts
+	//show "Δ" in the top right of the screen if we have unread texts
 	public void HandleHasUnreadMessages()
 	{
 		if (hasUnreadTexts)
@@ -92,15 +90,17 @@ public class PhoneScript : MonoBehaviour {
 
 		if (PhoneState.GetState () == PhoneState.State.HomeScreen)
 		{
-			SetViewToHomeScreen();
+			SetViewToHomeScreen();//refresh
 		}
 	}
 
+	//add a digit to the number being entered on the screen
 	public void AddToNumberOnScreen(int num)
 	{
 		numberOnScreen += ""+num;
 	}
 
+	//remove a digit from the number being entered on the screen
 	public void RemoveEndOfNumberOnScreen()
 	{
 		numberOnScreen = numberOnScreen.Substring(0, numberOnScreen.Length-1);
@@ -135,10 +135,6 @@ public class PhoneScript : MonoBehaviour {
 	{
 		Contact c = new Contact (name, number);
 		cc.AddContactToContacts (c, true);
-
-//		Contact c5 = ScriptableObject.CreateInstance("Contact") as Contact;
-//		c5.DataInit(name, number);
-//		cc.AddContactToContacts (c5);
 	}
 
 	void UpdateHomeScreen()

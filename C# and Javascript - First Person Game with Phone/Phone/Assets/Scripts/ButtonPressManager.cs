@@ -251,7 +251,7 @@ public class ButtonPressManager : MonoBehaviour {
 			}
 			break;
 		default:
-			print ("Incorrect state.");
+			Debug.Log ("Incorrect state.");
 			break;
 		}
 	}
