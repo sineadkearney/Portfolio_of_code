@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ButtonPressManager : MonoBehaviour {
+public class ButtonPressManager: MonoBehaviour {
 
 	enum Button
 	{
@@ -30,9 +30,50 @@ public class ButtonPressManager : MonoBehaviour {
 	private CanvasScript cs;
 	private PhoneScript ps;
 
+	private float timeAtLastInput;
+	private float maxTimeBetweenInputs = 3.0f; //seconds.
+
+	int prevAlphaInputButtonIndex = -1; //0 -> 9
+	int alphaInputButtonIndex = -1; //0 -> 9
+	int alphaInputIndex = -1; // 0->...
+	bool alphaInputPressed = false;
+	//string[][] alphaInput = new string [0][0];
+	string[][] alphaInput = new string[10][];
+
+		/*{" "}, 
+		{".", ",", "'", "\"", "?", "!", ":", ";", "-", "_", "(", ")" }, 
+		{"a", "b", "c", "A", "B", "C"},
+		{"d", "e", "f", "D", "E", "F"},
+		{"g", "h", "i", "G", "H", "I"},
+		{"j", "k", "l", "J", "K", "L"},
+		{"m", "n", "o", "M", "N", "O"},
+		{"p", "q", "r", "s", "P", "Q", "R", "S"},
+		{"t", "u", "v", "T", "U", "V"},
+		{"w", "x", "y", "z", "W", "X", "Y", "Z"}};*/
+
+
 	//private PhoneState state;
 	// Use this for initialization
 	void Start () {
+		alphaInput[0] = new string[] {" "};
+		alphaInput [1] = new string[] {".", ",", "'", "\"", "?", "!", ":", ";", "-", "_", "(", ")" };
+		alphaInput [2] = new string[] {"a", "b", "c", "A", "B", "C"};
+		alphaInput [3] = new string[]{"d", "e", "f", "D", "E", "F"};
+		alphaInput [4] = new string[]{"g", "h", "i", "G", "H", "I"};
+		alphaInput [5] = new string[]{"j", "k", "l", "J", "K", "L"};
+		alphaInput [6] = new string[]{"m", "n", "o", "M", "N", "O"};
+		alphaInput [7] = new string[]{"p", "q", "r", "s", "P", "Q", "R", "S"};
+		alphaInput [8] = new string[]{"t", "u", "v", "T", "U", "V"};
+		alphaInput [9] = new string[]{"w", "x", "y", "z", "W", "X", "Y", "Z"};
+
+		/*for (int i = 0; i < alphaInput.Length; i++)
+		{
+			for (int j = 0; j < alphaInput[i].Length; j++)
+			{
+				Debug.Log (alphaInput[i][j]);
+			}
+		}*/
+
 		GameObject canvas = GameObject.FindGameObjectWithTag ("PhoneCanvas");
 		cs = (CanvasScript) canvas.GetComponent<CanvasScript>();
 		cs.ResetAllLines ();
@@ -40,9 +81,45 @@ public class ButtonPressManager : MonoBehaviour {
 		GameObject phone = GameObject.FindGameObjectWithTag ("Phone");
 		ps = (PhoneScript)phone.GetComponent<PhoneScript> ();
 	}
+
+	void Update()	{
+
+		float currTime = Time.time;
+		if (alphaInputPressed && currTime > timeAtLastInput + maxTimeBetweenInputs)
+		{
+			alphaInputPressed = false;
+			ps.SetNewTextMessageContent(alphaInput[alphaInputButtonIndex][alphaInputIndex]);//save the letter
+			alphaInputIndex = -1;
+			prevAlphaInputButtonIndex = -1;
+		}
+	
+	}
+
+	private void HandleAlphaInput(int buttonNum)
+	{
+		alphaInputButtonIndex = buttonNum;
+
+		if (prevAlphaInputButtonIndex != -1 && alphaInputButtonIndex != prevAlphaInputButtonIndex) //prevAlphaInputButtonIndex value handled in Update()
+		{
+			ps.SetNewTextMessageContent(alphaInput[prevAlphaInputButtonIndex][alphaInputIndex]); //save the prev letter
+			alphaInputIndex = 0;
+		}
+		else
+		{
+			alphaInputIndex = (alphaInputIndex + 1 ) % alphaInput[alphaInputButtonIndex].Length;
+
+		}
+		ps.SetViewToTextMessageCreate(alphaInput[alphaInputButtonIndex][alphaInputIndex]);
+		ps.ChangeCursorPos (true);
+		//else
+		prevAlphaInputButtonIndex = alphaInputButtonIndex;
+		alphaInputPressed = true;
+	}
 	
 	public void ButtonInput(int num)
 	{
+
+
 		//use switch by state. Then handle button input in each case
 		Button btn = (Button)num;
 		cs.ResetAllLines ();
@@ -142,6 +219,63 @@ public class ButtonPressManager : MonoBehaviour {
 				ps.ResetAndSetViewToHomeScreen();
 			}
 			break;
+
+		case PhoneState.State.TextMessageCreate:
+			switch (btn)
+			{
+				case Button.Enter:
+					Debug.Log("Send");
+					break;
+				case Button.Cancel:
+					ps.TextMessageCreateHandleCancel();
+					break;
+				case Button.Zero:
+					//Debug.Log (Time.time);
+					HandleAlphaInput(0);
+					break;
+				case Button.One:
+					HandleAlphaInput(1);
+					break;
+				case Button.Two:
+					HandleAlphaInput(2);
+					break;
+				case Button.Three:
+					HandleAlphaInput(3);
+					break;
+				case Button.Four:
+					HandleAlphaInput(4);
+					break;
+				case Button.Five:
+					HandleAlphaInput(5);
+					break;
+				case Button.Six:
+					HandleAlphaInput(6);
+					break;
+				case Button.Seven:
+					HandleAlphaInput(7);
+					break;
+				case Button.Eight:
+					HandleAlphaInput(8);
+					break;
+				case Button.Nine:
+					HandleAlphaInput(9);
+					break;
+				case Button.HangUp:
+					ps.ResetAndSetViewToHomeScreen();
+					break;
+				case Button.Left:
+				case Button.Up:
+					ps.ChangeCursorPos(true);
+					break;
+				case Button.Right:
+				case Button.Down:
+					ps.ChangeCursorPos(false);
+					break;
+				default:
+					Debug.Log ("Incorrect state.");
+					break;
+			}
+			break;
 			
 		case PhoneState.State.TextMessageInbox:
 			if (btn == Button.Enter)
@@ -176,11 +310,11 @@ public class ButtonPressManager : MonoBehaviour {
 			}
 			else if (btn == Button.Up)
 			{
-				ps.InboxScrollUp();
+				ps.OutboxScrollUp();
 			}
 			else if (btn == Button.Down)
 			{
-				ps.InboxScrollDown();
+				ps.OutboxScrollDown();
 			}
 			else if (btn == Button.HangUp)
 			{
@@ -188,15 +322,16 @@ public class ButtonPressManager : MonoBehaviour {
 			}
 			break;
 			
-		case PhoneState.State.TextMessageDisplay:
-			
+		//case PhoneState.State.TextMessageInboxDisplay:
+		case PhoneState.State.TextMessageDisplay:	
 			if (btn == Button.Cancel)
 			{
 				ps.SetViewToTextMessageCollection();
 			}
 			else if (btn == Button.Enter)
 			{
-				ps.SetViewToInboxTextMessageOptions();
+				//ps.SetViewToInboxTextMessageOptions();
+				ps.SetViewToTextMessageOptions();
 			}
 			else if (btn == Button.HangUp)
 			{
@@ -208,15 +343,26 @@ public class ButtonPressManager : MonoBehaviour {
 			
 			if ( btn == Button.Enter)
 			{
-				ps.DeleteSelectedInboxText();
+				//ps.DeleteSelectedInboxText(); //TODO: inbox, outbox, etc
+				//TextMessageOptions.DeleteTextViaOptions();
+				TextMessageOptions.SelectEnter();
 			}
 			else if (btn == Button.Cancel)
 			{
-				ps.ReadSelectedInboxText();
+				//ps.ReadSelectedInboxText(); //TODO: inbox, outbox, etc
+				TextMessageOptions.SetViewBackToText();
 			}
 			else if (btn == Button.HangUp)
 			{
-				ps.ResetAndSetViewToHomeScreen();
+				ps.ResetAndSetViewToHomeScreen(); 
+			}
+			else if (btn == Button.Up)
+			{
+				TextMessageOptions.ScrollUp();
+			}
+			else if (btn == Button.Down)
+			{
+				TextMessageOptions.ScrollDown();
 			}
 			break;
 
@@ -254,5 +400,7 @@ public class ButtonPressManager : MonoBehaviour {
 			Debug.Log ("Incorrect state.");
 			break;
 		}
+		timeAtLastInput = Time.time;
+		Debug.Log (timeAtLastInput);
 	}
 }

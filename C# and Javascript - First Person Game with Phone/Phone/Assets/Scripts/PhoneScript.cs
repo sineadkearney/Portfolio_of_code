@@ -9,6 +9,10 @@ public class PhoneScript : MonoBehaviour {
 	public GameObject canvas;
 	private CanvasScript cs;
 
+	//for creating a text message
+	private string createTextMessageContent = "";
+	private string currentInput = "";
+
 	private string numberOnScreen;
 	private string homeScreenTextContentOrig = "Welcome";
 	private string homeScreenTextContent;
@@ -55,16 +59,33 @@ public class PhoneScript : MonoBehaviour {
 		HandleHasUnreadMessages ();
 		SetViewToHomeScreen ();
 
+
 		//example of adding a new outbox text
 		//TextMessage outText = new TextMessage ("me", "my text message");
 		//outboxTexts.AddTextToTexts(outText);
 
 	}
 
+	//private bool showingLine = true;
+	private float blinkingTime = 1.0f; //seconds.
+	private float timeLastBlinked = 0.0f;
+	private string cursor = "|";
 	// Update is called once per frame
-	//void Update () {
-	
-	//}
+	/*void Update () { //TODO: working on
+		if (PhoneState.GetState () == PhoneState.State.TextMessageCreate)
+		{
+			float currTime = Time.time;
+			if (currTime > timeLastBlinked + blinkingTime)
+			{
+				timeLastBlinked = currTime;
+				SetViewToTextMessageCreate(cursor);
+				if (cursor == "|") 
+					cursor = "";
+				else 
+					cursor = "|";
+			}
+		}
+	}*/
 
 	[RPC]
 	void UpdateText(string content)
@@ -209,7 +230,71 @@ public class PhoneScript : MonoBehaviour {
 			PhoneState.SetState (PhoneState.State.TextMessageOutbox);
 			outboxTexts.SetViewToTextMessageCollection ();
 		}
+		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Create)
+		{
+			PhoneState.SetState (PhoneState.State.TextMessageCreate);
+			//outboxTexts.SetViewToTextMessageCollection ();
+			SetViewToTextMessageCreate("");
+		}
 	}
+
+	//////////// create a text, start ////////////////////////
+	/// //TODO: should probably move to its own class
+	public void SetViewToTextMessageCreate(string newLetter)
+	{
+		cs.SetHeadingText("Create");
+		cs.SetScreenText(createTextMessageContent + newLetter);
+		//I want to set newLetter at index cursorPos
+		/*string leftString = "";
+		string rightString = "";
+		if (createTextMessageContent.Length > 0 && cursorPos >= 0 && cursorPos <= createTextMessageContent.Length)
+		{
+			Debug.Log ("cursorPos " + cursorPos);
+			if (cursorPos > 0 && createTextMessageContent.Length >= cursorPos)
+				leftString = createTextMessageContent.Substring (0, cursorPos);
+			rightString = createTextMessageContent.Substring (cursorPos);
+		}
+		cs.SetScreenText(leftString + newLetter + rightString);*/
+		if (createTextMessageContent == "")
+			cs.SetNavLeftText("Back");
+		else
+			cs.SetNavLeftText("Delete");
+		cs.SetNavRightText("Send");
+	}
+
+	public void SetNewTextMessageContent(string newLetter)
+	{
+		cursorPos += 1;
+		createTextMessageContent += newLetter;
+		SetViewToTextMessageCreate ("");
+	}
+
+	public void TextMessageCreateHandleCancel()
+	{
+		if (createTextMessageContent == "")
+		{
+			SetViewToSubMainMenu();
+		}
+		else //delete the last char
+		{
+			createTextMessageContent = createTextMessageContent.Substring (0, createTextMessageContent.Length - 1);
+			SetViewToTextMessageCreate ("");
+		}
+	}
+
+	int cursorPos = 0;
+	public void ChangeCursorPos(bool increase)
+	{
+		if (increase)
+		{
+			cursorPos += 1;
+		}
+		else if (cursorPos > 0)
+		{
+			cursorPos -= 1;
+		}
+	}
+	////////////// create a text, end ////////////////////////
 
 	public void ReadSelectedInboxText()
 	{
@@ -226,9 +311,36 @@ public class PhoneScript : MonoBehaviour {
 		inboxTexts.DeleteSelectedText ();
 	}
 
-	public void SetViewToInboxTextMessageOptions()
+	public void DeleteSelectedOutboxText()
+	{
+		outboxTexts.DeleteSelectedText ();
+	}
+
+	/*public void SetViewToInboxTextMessageOptions()
 	{
 		inboxTexts.SetViewToTextMessageOptions ();
+	}*/
+
+	public void SetViewToTextMessageOptions()
+	{
+		if (TextMessageMenu.GetState() == TextMessageMenu.TextMessageMenuState.Inbox)
+		{
+			//PhoneState.SetState (PhoneState.State.TextMessageInbox);
+			//inboxTexts.SetViewToTextMessageCollection ();
+			inboxTexts.SetViewToTextMessageOptions();
+		}
+		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Outbox)
+		{
+			//PhoneState.SetState (PhoneState.State.TextMessageOutbox);
+			//outboxTexts.SetViewToTextMessageCollection ();
+			outboxTexts.SetViewToTextMessageOptions();
+		}
+		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Create)
+		{
+			//PhoneState.SetState (PhoneState.State.TextMessageCreate);
+			//outboxTexts.SetViewToTextMessageCollection ();
+			//SetViewToTextMessageCreate("");
+		}
 	}
 
 	public void InboxScrollUp()
@@ -239,6 +351,16 @@ public class PhoneScript : MonoBehaviour {
 	public void InboxScrollDown()
 	{
 		inboxTexts.ScrollDown ();
+	}
+
+	public void OutboxScrollUp()
+	{
+		outboxTexts.ScrollUp ();
+	}
+	
+	public void OutboxScrollDown()
+	{
+		outboxTexts.ScrollDown ();
 	}
 
 	public void ContactsScrollUp()

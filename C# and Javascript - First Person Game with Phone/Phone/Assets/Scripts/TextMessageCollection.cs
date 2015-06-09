@@ -35,6 +35,7 @@ public class TextMessageCollection {
 	{
 		fileName = incomingFileName;
 		fileData = FileManager.Load (fileName);
+		//int intType = (int)type;
 		collectionType = type;
 		cc = ps.cc;
 
@@ -299,11 +300,13 @@ public class TextMessageCollection {
 		string str = "";
 		if (collectionType == CollectionType.Inbox)
 		{
+			//PhoneState.SetState(PhoneState.State.TextMessageInboxDisplay);
 			string senderNumber = txt.GetSender();
 			str = "From: " + GetContactFromNumber(senderNumber, txt.IsTraceable()) + "\n";
 		}
 		else
 		{
+			//PhoneState.SetState(PhoneState.State.TextMessageOutboxDisplay);
 			string recipNumber = txt.GetRecipient();
 			str = "To: " + GetContactFromNumber(recipNumber, true) + "\n";
 		}
@@ -349,12 +352,15 @@ public class TextMessageCollection {
 	//display the options menu for the text message
 	public void SetViewToTextMessageOptions()
 	{
-		cs.ResetAllLines ();
-		cs.SetLineContent (1, "Delete?", true);
-		PhoneState.SetState(PhoneState.State.TextMessageOptions);
 		indexOfTextInOptions = readTextAtIndex;
-		cs.SetNavLeftText ("Back");
-		cs.SetNavRightText ("Select");
+		if (collectionType == CollectionType.Inbox)
+		{
+			TextMessageOptions.SetViewToInboxTextOptions();	
+		}
+		else if (collectionType == CollectionType.Outbox)
+		{
+			TextMessageOptions.SetViewToOutboxTextOptions();	
+		}
 	}
 
 	//display the selected text

@@ -8,6 +8,7 @@ public class TextMessageMenu {
 	{
 		Inbox,
 		Outbox,
+		Create,
 	};
 	private static TextMessageMenuState textMessageMenuState = TextMessageMenuState.Inbox;
 	private int enumLength = 0;
