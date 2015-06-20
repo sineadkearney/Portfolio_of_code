@@ -33,10 +33,10 @@ public class ButtonPressManager: MonoBehaviour {
 	private float timeAtLastInput;
 	private float maxTimeBetweenInputs = 3.0f; //seconds.
 
-	int prevAlphaInputButtonIndex = -1; //0 -> 9
-	int alphaInputButtonIndex = -1; //0 -> 9
-	int alphaInputIndex = -1; // 0->...
-	bool alphaInputPressed = false;
+	static int prevAlphaInputButtonIndex = -1; //0 -> 9
+	static int alphaInputButtonIndex = -1; //0 -> 9
+	static int alphaInputIndex = -1; // 0->...
+	static bool alphaInputPressed = false;
 	//string[][] alphaInput = new string [0][0];
 	string[][] alphaInput = new string[10][];
 
@@ -65,14 +65,6 @@ public class ButtonPressManager: MonoBehaviour {
 		alphaInput [7] = new string[]{"p", "q", "r", "s", "P", "Q", "R", "S"};
 		alphaInput [8] = new string[]{"t", "u", "v", "T", "U", "V"};
 		alphaInput [9] = new string[]{"w", "x", "y", "z", "W", "X", "Y", "Z"};
-
-		/*for (int i = 0; i < alphaInput.Length; i++)
-		{
-			for (int j = 0; j < alphaInput[i].Length; j++)
-			{
-				Debug.Log (alphaInput[i][j]);
-			}
-		}*/
 
 		GameObject canvas = GameObject.FindGameObjectWithTag ("PhoneCanvas");
 		cs = (CanvasScript) canvas.GetComponent<CanvasScript>();
@@ -109,11 +101,17 @@ public class ButtonPressManager: MonoBehaviour {
 			alphaInputIndex = (alphaInputIndex + 1 ) % alphaInput[alphaInputButtonIndex].Length;
 
 		}
-		ps.SetViewToTextMessageCreate(alphaInput[alphaInputButtonIndex][alphaInputIndex]);
-		ps.ChangeCursorPos (true);
-		//else
+		ps.AddTempLetterToText(alphaInput[alphaInputButtonIndex][alphaInputIndex]);
 		prevAlphaInputButtonIndex = alphaInputButtonIndex;
 		alphaInputPressed = true;
+	}
+
+	public static void ResetAplhaButtonInputs()
+	{
+		prevAlphaInputButtonIndex = -1;
+		alphaInputButtonIndex = -1;
+		alphaInputIndex = -1;
+		alphaInputPressed = false;
 	}
 	
 	public void ButtonInput(int num)
@@ -122,8 +120,8 @@ public class ButtonPressManager: MonoBehaviour {
 
 		//use switch by state. Then handle button input in each case
 		Button btn = (Button)num;
-		cs.ResetAllLines ();
-		cs.SetScreenText ("");
+		//cs.ResetAllLines ();
+		//cs.SetScreenText ("");
 
 		PhoneState.State state = PhoneState.GetState ();
 		Debug.Log ("state: " + state + " btn: " + btn);
@@ -131,7 +129,10 @@ public class ButtonPressManager: MonoBehaviour {
 		{
 		
 		case PhoneState.State.HomeScreen:
-			
+
+			cs.ResetAllLines ();
+			cs.SetScreenText ("");
+
 			if (btn >= Button.Zero && btn <= Button.Nine)
 			{
 				ps.AddToNumberOnScreen(num);
@@ -148,7 +149,10 @@ public class ButtonPressManager: MonoBehaviour {
 			break;
 			
 		case PhoneState.State.NumberOnScreen:
-			
+
+			cs.ResetAllLines ();
+			cs.SetScreenText ("");
+
 			if (btn >= Button.Zero && btn <= Button.Nine)
 			{
 				ps.AddToNumberOnScreen(num);
@@ -175,6 +179,10 @@ public class ButtonPressManager: MonoBehaviour {
 			break;
 			
 		case PhoneState.State.MainMenu:
+
+			cs.ResetAllLines ();
+			cs.SetScreenText ("");
+
 			if (btn == Button.Enter)
 			{
 				ps.SetViewToSubMainMenu();
@@ -198,6 +206,10 @@ public class ButtonPressManager: MonoBehaviour {
 			break;
 			
 		case PhoneState.State.TextMessageMenu:
+
+			cs.ResetAllLines ();
+			cs.SetScreenText ("");
+
 			if (btn == Button.Enter)
 			{
 				ps.SetViewToTextMessageCollection();
@@ -265,11 +277,11 @@ public class ButtonPressManager: MonoBehaviour {
 					break;
 				case Button.Left:
 				case Button.Up:
-					ps.ChangeCursorPos(true);
+					ps.MoveCursorPosRight(false);
 					break;
 				case Button.Right:
 				case Button.Down:
-					ps.ChangeCursorPos(false);
+					ps.MoveCursorPosRight(true);
 					break;
 				default:
 					Debug.Log ("Incorrect state.");
@@ -278,6 +290,10 @@ public class ButtonPressManager: MonoBehaviour {
 			break;
 			
 		case PhoneState.State.TextMessageInbox:
+
+			cs.ResetAllLines ();
+			cs.SetScreenText ("");
+
 			if (btn == Button.Enter)
 			{
 				ps.ReadSelectedInboxText();
@@ -300,6 +316,10 @@ public class ButtonPressManager: MonoBehaviour {
 			}
 			break;
 		case PhoneState.State.TextMessageOutbox:
+
+			cs.ResetAllLines ();
+			cs.SetScreenText ("");
+
 			if (btn == Button.Enter)
 			{
 				ps.ReadSelectedOutboxText();
@@ -324,6 +344,10 @@ public class ButtonPressManager: MonoBehaviour {
 			
 		//case PhoneState.State.TextMessageInboxDisplay:
 		case PhoneState.State.TextMessageDisplay:	
+
+			cs.ResetAllLines ();
+			cs.SetScreenText ("");
+
 			if (btn == Button.Cancel)
 			{
 				ps.SetViewToTextMessageCollection();
@@ -340,16 +364,16 @@ public class ButtonPressManager: MonoBehaviour {
 			break;
 			
 		case PhoneState.State.TextMessageOptions:
-			
+
+			cs.ResetAllLines ();
+			cs.SetScreenText ("");
+
 			if ( btn == Button.Enter)
 			{
-				//ps.DeleteSelectedInboxText(); //TODO: inbox, outbox, etc
-				//TextMessageOptions.DeleteTextViaOptions();
 				TextMessageOptions.SelectEnter();
 			}
 			else if (btn == Button.Cancel)
 			{
-				//ps.ReadSelectedInboxText(); //TODO: inbox, outbox, etc
 				TextMessageOptions.SetViewBackToText();
 			}
 			else if (btn == Button.HangUp)
@@ -367,9 +391,12 @@ public class ButtonPressManager: MonoBehaviour {
 			break;
 
 		case PhoneState.State.ContactsList:
+
+			cs.ResetAllLines ();
+			cs.SetScreenText ("");
+
 			if (btn == Button.Enter)
 			{
-				//ps.ReadSelectedOutboxText();
 				Debug.Log ("enter");
 			}
 			else if ( btn == Button.Cancel)
@@ -390,6 +417,10 @@ public class ButtonPressManager: MonoBehaviour {
 			}
 			break;
 		case PhoneState.State.ErrorMessage:
+
+			cs.ResetAllLines ();
+			cs.SetScreenText ("");
+
 			if (btn == Button.Cancel)
 			{
 				PhoneState.SetState(PhoneState.GetPrevState());
@@ -397,6 +428,10 @@ public class ButtonPressManager: MonoBehaviour {
 			}
 			break;
 		default:
+
+			cs.ResetAllLines ();
+			cs.SetScreenText ("");
+
 			Debug.Log ("Incorrect state.");
 			break;
 		}

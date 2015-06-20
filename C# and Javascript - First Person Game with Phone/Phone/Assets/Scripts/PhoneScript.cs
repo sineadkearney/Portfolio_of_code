@@ -67,25 +67,28 @@ public class PhoneScript : MonoBehaviour {
 	}
 
 	//private bool showingLine = true;
-	private float blinkingTime = 1.0f; //seconds.
+	private float blinkingTime = 0.75f; //seconds.
 	private float timeLastBlinked = 0.0f;
 	private string cursor = "|";
+	private int cursorPos = 0;
+	private int insertAtIndex = 0;
 	// Update is called once per frame
-	/*void Update () { //TODO: working on
+	void Update () { //TODO: working on
 		if (PhoneState.GetState () == PhoneState.State.TextMessageCreate)
 		{
 			float currTime = Time.time;
 			if (currTime > timeLastBlinked + blinkingTime)
 			{
 				timeLastBlinked = currTime;
-				SetViewToTextMessageCreate(cursor);
+				UpdateTextMessageContent(cursor);
+				//SetViewToTextMessageCreate(cursor);
 				if (cursor == "|") 
 					cursor = "";
 				else 
 					cursor = "|";
 			}
 		}
-	}*/
+	}
 
 	[RPC]
 	void UpdateText(string content)
@@ -240,12 +243,12 @@ public class PhoneScript : MonoBehaviour {
 
 	//////////// create a text, start ////////////////////////
 	/// //TODO: should probably move to its own class
-	public void SetViewToTextMessageCreate(string newLetter)
+	private string tempLetter = "";
+	public void UpdateTextMessageContent(string cursor)
 	{
-		cs.SetHeadingText("Create");
-		cs.SetScreenText(createTextMessageContent + newLetter);
 		//I want to set newLetter at index cursorPos
-		/*string leftString = "";
+		
+		string leftString = "";
 		string rightString = "";
 		if (createTextMessageContent.Length > 0 && cursorPos >= 0 && cursorPos <= createTextMessageContent.Length)
 		{
@@ -254,7 +257,32 @@ public class PhoneScript : MonoBehaviour {
 				leftString = createTextMessageContent.Substring (0, cursorPos);
 			rightString = createTextMessageContent.Substring (cursorPos);
 		}
-		cs.SetScreenText(leftString + newLetter + rightString);*/
+		if (tempLetter != "")
+		{
+			int i = 0;
+		}
+		cs.SetScreenText(leftString + tempLetter + cursor + rightString);
+	}
+
+	private void ForceCursorOn()
+	{
+		cursor = "|";
+		timeLastBlinked = Time.time - 0.5f; //it feels like the cursor stays like "|" for too long
+		UpdateTextMessageContent (cursor);
+	}
+
+	public void AddTempLetterToText(string newLetter)
+	{
+		tempLetter = newLetter;
+		UpdateTextMessageContent(cursor);
+	}
+
+	public void SetViewToTextMessageCreate(string newLetter)
+	{
+		cs.SetHeadingText("Create");
+
+		//cs.SetScreenText(createTextMessageContent + newLetter);
+
 		if (createTextMessageContent == "")
 			cs.SetNavLeftText("Back");
 		else
@@ -264,9 +292,29 @@ public class PhoneScript : MonoBehaviour {
 
 	public void SetNewTextMessageContent(string newLetter)
 	{
-		cursorPos += 1;
-		createTextMessageContent += newLetter;
+		tempLetter = newLetter;
+		SaveTempLetterInString ();
+		cursorPos += 1; //increase cursorPos now that they've added a char to the string
+		tempLetter = "";
 		SetViewToTextMessageCreate ("");
+	}
+
+	private void SaveTempLetterInString()
+	{
+		string leftString = "";
+		string rightString = "";
+		if (createTextMessageContent.Length > 0 && cursorPos >= 0 && cursorPos <= createTextMessageContent.Length)
+		{
+			Debug.Log ("cursorPos " + cursorPos);
+			if (cursorPos > 0 && createTextMessageContent.Length >= cursorPos)
+				leftString = createTextMessageContent.Substring (0, cursorPos);
+			rightString = createTextMessageContent.Substring (cursorPos);
+		}
+		if (tempLetter != "")
+		{
+			int i = 0;
+		}
+		createTextMessageContent = leftString + tempLetter + rightString;
 	}
 
 	public void TextMessageCreateHandleCancel()
@@ -275,23 +323,67 @@ public class PhoneScript : MonoBehaviour {
 		{
 			SetViewToSubMainMenu();
 		}
-		else //delete the last char
+		else //delete the char behind the cursor
 		{
-			createTextMessageContent = createTextMessageContent.Substring (0, createTextMessageContent.Length - 1);
+			if (tempLetter != "")
+			{
+				//SaveTempLetterInString();
+				tempLetter = "";
+				//cursorPos -= 1;
+			}
+			else if (cursorPos > 0)
+			{
+				//createTextMessageContent = createTextMessageContent.Substring (0, createTextMessageContent.Length - 1);
+				string leftString = "";
+				string rightString = "";
+				leftString = createTextMessageContent.Substring (0, cursorPos-1);
+				rightString = createTextMessageContent.Substring (cursorPos);
+				createTextMessageContent = leftString+rightString;
+				cursorPos -= 1;
+			}
+
 			SetViewToTextMessageCreate ("");
+			UpdateTextMessageContent(cursor);
+			ButtonPressManager.ResetAplhaButtonInputs();
 		}
 	}
 
-	int cursorPos = 0;
-	public void ChangeCursorPos(bool increase)
+
+	public void MoveCursorPosRight(bool moveRight)
 	{
-		if (increase)
+		//if (moveRight && cursorPos <= createTextMessageContent.Length)
+		if (moveRight)
 		{
+			if (tempLetter != "")
+			{
+				SaveTempLetterInString();
+				tempLetter = "";
+				UpdateTextMessageContent(cursor);
+				ButtonPressManager.ResetAplhaButtonInputs();
+			}
+			else if (cursorPos >= createTextMessageContent.Length)
+			{
+				createTextMessageContent += " ";
+			}
+			//otherwise just move the cursor right one index
 			cursorPos += 1;
+			ForceCursorOn();
 		}
 		else if (cursorPos > 0)
 		{
-			cursorPos -= 1;
+			if (tempLetter != "")
+			{
+				SaveTempLetterInString();
+				tempLetter = "";
+				UpdateTextMessageContent(cursor);
+				ButtonPressManager.ResetAplhaButtonInputs();
+				//save temp letter at cursor pos, but don't move the cursor along one index
+			}
+			else
+			{
+				cursorPos -= 1;
+			}
+			ForceCursorOn();
 		}
 	}
 	////////////// create a text, end ////////////////////////
