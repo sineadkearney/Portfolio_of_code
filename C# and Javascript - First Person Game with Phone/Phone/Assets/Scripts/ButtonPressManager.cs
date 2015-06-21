@@ -29,6 +29,7 @@ public class ButtonPressManager: MonoBehaviour {
 
 	private CanvasScript cs;
 	private PhoneScript ps;
+	private TextStringCreation tsc;
 
 	private float timeAtLastInput;
 	private float maxTimeBetweenInputs = 3.0f; //seconds.
@@ -72,6 +73,8 @@ public class ButtonPressManager: MonoBehaviour {
 
 		GameObject phone = GameObject.FindGameObjectWithTag ("Phone");
 		ps = (PhoneScript)phone.GetComponent<PhoneScript> ();
+
+		tsc = ps.tsc;
 	}
 
 	void Update()	{
@@ -80,7 +83,8 @@ public class ButtonPressManager: MonoBehaviour {
 		if (alphaInputPressed && currTime > timeAtLastInput + maxTimeBetweenInputs)
 		{
 			alphaInputPressed = false;
-			ps.SetNewTextMessageContent(alphaInput[alphaInputButtonIndex][alphaInputIndex]);//save the letter
+			//ps.SetNewTextMessageContent(alphaInput[alphaInputButtonIndex][alphaInputIndex]);//save the letter
+			tsc.SetNewTextMessageContent(alphaInput[alphaInputButtonIndex][alphaInputIndex]);//save the letter
 			alphaInputIndex = -1;
 			prevAlphaInputButtonIndex = -1;
 		}
@@ -93,7 +97,8 @@ public class ButtonPressManager: MonoBehaviour {
 
 		if (prevAlphaInputButtonIndex != -1 && alphaInputButtonIndex != prevAlphaInputButtonIndex) //prevAlphaInputButtonIndex value handled in Update()
 		{
-			ps.SetNewTextMessageContent(alphaInput[prevAlphaInputButtonIndex][alphaInputIndex]); //save the prev letter
+			//ps
+			tsc.SetNewTextMessageContent(alphaInput[prevAlphaInputButtonIndex][alphaInputIndex]); //save the prev letter
 			alphaInputIndex = 0;
 		}
 		else
@@ -101,7 +106,8 @@ public class ButtonPressManager: MonoBehaviour {
 			alphaInputIndex = (alphaInputIndex + 1 ) % alphaInput[alphaInputButtonIndex].Length;
 
 		}
-		ps.AddTempLetterToText(alphaInput[alphaInputButtonIndex][alphaInputIndex]);
+		//ps
+		tsc.AddTempLetterToText(alphaInput[alphaInputButtonIndex][alphaInputIndex]);
 		prevAlphaInputButtonIndex = alphaInputButtonIndex;
 		alphaInputPressed = true;
 	}
@@ -239,7 +245,8 @@ public class ButtonPressManager: MonoBehaviour {
 					Debug.Log("Send");
 					break;
 				case Button.Cancel:
-					ps.TextMessageCreateHandleCancel();
+					//ps
+					tsc.TextMessageCreateHandleCancel();
 					break;
 				case Button.Zero:
 					//Debug.Log (Time.time);
@@ -277,11 +284,13 @@ public class ButtonPressManager: MonoBehaviour {
 					break;
 				case Button.Left:
 				case Button.Up:
-					ps.MoveCursorPosRight(false);
+					//ps
+					tsc.MoveCursorPosRight(false);
 					break;
 				case Button.Right:
 				case Button.Down:
-					ps.MoveCursorPosRight(true);
+					//ps	
+					tsc.MoveCursorPosRight(true);
 					break;
 				default:
 					Debug.Log ("Incorrect state.");

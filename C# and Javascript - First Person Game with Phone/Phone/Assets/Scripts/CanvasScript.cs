@@ -61,6 +61,11 @@ public class CanvasScript : MonoBehaviour {
 		LineText6.text = "";
 	}
 
+	public void SetReceptionText(string str)
+	{
+		receptionText.text = str;
+	}
+
 	public void SetLineContent(int index, string str, bool isSelected)
 	{
 		//Debug.Log ("SetLineContent() index: " + index + " str: " + str + " isSelected: " + isSelected);
@@ -138,8 +143,8 @@ public class CanvasScript : MonoBehaviour {
 
 	public void SetScreenText(string content)
 	{
-		StackFrame fr = new StackFrame(1,true);
-		StackTrace st = new StackTrace(fr);
+		//StackFrame fr = new StackFrame(1,true);
+		//StackTrace st = new StackTrace(fr);
 		screenText.text = content;
 	}
 

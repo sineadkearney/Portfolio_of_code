@@ -8,10 +8,10 @@ public class PhoneScript : MonoBehaviour {
 
 	public GameObject canvas;
 	private CanvasScript cs;
+	public TextStringCreation tsc;
 
 	//for creating a text message
-	private string createTextMessageContent = "";
-	private string currentInput = "";
+	//private string createTextMessageContent = "";
 
 	private string numberOnScreen;
 	private string homeScreenTextContentOrig = "Welcome";
@@ -22,16 +22,26 @@ public class PhoneScript : MonoBehaviour {
 	private TextMessageCollection outboxTexts;
 	private string outboxTextsJson = "C:\\Users\\Sinead\\Documents\\Phone\\Assets\\savedData\\outboxTexts.json";
 
+	public GameObject receptionIcon;
+	public Sprite hasReceptionSprite;
+	public Sprite noReceptionSprite;
 	public bool hasUnreadTexts = false;
+	public GameObject messageIcon;
+	public Sprite hasNewMessageSprite;
 
 	private TextMessageMenu tmm;
 	private MainMenu mm;
 	public ContactsCollection cc;
 
+	private bool hadRecption = false;
+	public bool hasReception = false;
+	private float creditAmount = 0.0f;
+
 	// Use this for initialization
 	//TurnOnPhone()
 	void Start () {
 
+		tsc = gameObject.GetComponent<TextStringCreation>();
 		cs = (CanvasScript) canvas.GetComponent<CanvasScript>();
 		cs.ResetAllLines ();
 
@@ -59,36 +69,34 @@ public class PhoneScript : MonoBehaviour {
 		HandleHasUnreadMessages ();
 		SetViewToHomeScreen ();
 
-
+		if (hasReception) 
+		{
+			receptionIcon.GetComponent<SpriteRenderer> ().sprite = hasReceptionSprite;
+		}
+		else
+		{
+			receptionIcon.GetComponent<SpriteRenderer> ().sprite = noReceptionSprite;
+		}
 		//example of adding a new outbox text
 		//TextMessage outText = new TextMessage ("me", "my text message");
 		//outboxTexts.AddTextToTexts(outText);
 
 	}
 
-	//private bool showingLine = true;
-	private float blinkingTime = 0.75f; //seconds.
-	private float timeLastBlinked = 0.0f;
-	private string cursor = "|";
-	private int cursorPos = 0;
-	private int insertAtIndex = 0;
-	// Update is called once per frame
-	void Update () { //TODO: working on
-		if (PhoneState.GetState () == PhoneState.State.TextMessageCreate)
+	/*void Update()
+	{
+		if (hasReception && !hadRecption) 
 		{
-			float currTime = Time.time;
-			if (currTime > timeLastBlinked + blinkingTime)
-			{
-				timeLastBlinked = currTime;
-				UpdateTextMessageContent(cursor);
-				//SetViewToTextMessageCreate(cursor);
-				if (cursor == "|") 
-					cursor = "";
-				else 
-					cursor = "|";
-			}
+			//we newly have reception
+			receptionIcon.GetComponent<SpriteRenderer> ().sprite = hasReceptionSprite;
 		}
-	}
+		else if (!hasReception && hadRecption)
+		{
+			//newly lost reception
+			receptionIcon.GetComponent<SpriteRenderer> ().sprite = noReceptionSprite;
+		}
+		hadRecption = hasReception;
+	}*/
 
 	[RPC]
 	void UpdateText(string content)
@@ -103,12 +111,12 @@ public class PhoneScript : MonoBehaviour {
 	{
 		if (hasUnreadTexts)
 		{
-			cs.SetMessageIconText ("Δ");
+			messageIcon.GetComponent<SpriteRenderer> ().sprite = hasNewMessageSprite;
 			homeScreenTextContent = homeScreenTextContentOrig + "\nNew Message!";
 		}
 		else
 		{
-			cs.SetMessageIconText("");
+			messageIcon.GetComponent<SpriteRenderer> ().sprite = null;
 			homeScreenTextContent = homeScreenTextContentOrig + "\nNo New Messages";
 		}
 
@@ -236,157 +244,10 @@ public class PhoneScript : MonoBehaviour {
 		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Create)
 		{
 			PhoneState.SetState (PhoneState.State.TextMessageCreate);
-			//outboxTexts.SetViewToTextMessageCollection ();
-			SetViewToTextMessageCreate("");
+			//prev: no tsc
+			tsc.SetViewToTextMessageCreate();
 		}
 	}
-
-	//////////// create a text, start ////////////////////////
-	/// //TODO: should probably move to its own class
-	private string tempLetter = "";
-	public void UpdateTextMessageContent(string cursor)
-	{
-		//I want to set newLetter at index cursorPos
-		
-		string leftString = "";
-		string rightString = "";
-		if (createTextMessageContent.Length > 0 && cursorPos >= 0 && cursorPos <= createTextMessageContent.Length)
-		{
-			Debug.Log ("cursorPos " + cursorPos);
-			if (cursorPos > 0 && createTextMessageContent.Length >= cursorPos)
-				leftString = createTextMessageContent.Substring (0, cursorPos);
-			rightString = createTextMessageContent.Substring (cursorPos);
-		}
-		if (tempLetter != "")
-		{
-			int i = 0;
-		}
-		cs.SetScreenText(leftString + tempLetter + cursor + rightString);
-	}
-
-	private void ForceCursorOn()
-	{
-		cursor = "|";
-		timeLastBlinked = Time.time - 0.5f; //it feels like the cursor stays like "|" for too long
-		UpdateTextMessageContent (cursor);
-	}
-
-	public void AddTempLetterToText(string newLetter)
-	{
-		tempLetter = newLetter;
-		UpdateTextMessageContent(cursor);
-	}
-
-	public void SetViewToTextMessageCreate(string newLetter)
-	{
-		cs.SetHeadingText("Create");
-
-		//cs.SetScreenText(createTextMessageContent + newLetter);
-
-		if (createTextMessageContent == "")
-			cs.SetNavLeftText("Back");
-		else
-			cs.SetNavLeftText("Delete");
-		cs.SetNavRightText("Send");
-	}
-
-	public void SetNewTextMessageContent(string newLetter)
-	{
-		tempLetter = newLetter;
-		SaveTempLetterInString ();
-		cursorPos += 1; //increase cursorPos now that they've added a char to the string
-		tempLetter = "";
-		SetViewToTextMessageCreate ("");
-	}
-
-	private void SaveTempLetterInString()
-	{
-		string leftString = "";
-		string rightString = "";
-		if (createTextMessageContent.Length > 0 && cursorPos >= 0 && cursorPos <= createTextMessageContent.Length)
-		{
-			Debug.Log ("cursorPos " + cursorPos);
-			if (cursorPos > 0 && createTextMessageContent.Length >= cursorPos)
-				leftString = createTextMessageContent.Substring (0, cursorPos);
-			rightString = createTextMessageContent.Substring (cursorPos);
-		}
-		if (tempLetter != "")
-		{
-			int i = 0;
-		}
-		createTextMessageContent = leftString + tempLetter + rightString;
-	}
-
-	public void TextMessageCreateHandleCancel()
-	{
-		if (createTextMessageContent == "")
-		{
-			SetViewToSubMainMenu();
-		}
-		else //delete the char behind the cursor
-		{
-			if (tempLetter != "")
-			{
-				//SaveTempLetterInString();
-				tempLetter = "";
-				//cursorPos -= 1;
-			}
-			else if (cursorPos > 0)
-			{
-				//createTextMessageContent = createTextMessageContent.Substring (0, createTextMessageContent.Length - 1);
-				string leftString = "";
-				string rightString = "";
-				leftString = createTextMessageContent.Substring (0, cursorPos-1);
-				rightString = createTextMessageContent.Substring (cursorPos);
-				createTextMessageContent = leftString+rightString;
-				cursorPos -= 1;
-			}
-
-			SetViewToTextMessageCreate ("");
-			UpdateTextMessageContent(cursor);
-			ButtonPressManager.ResetAplhaButtonInputs();
-		}
-	}
-
-
-	public void MoveCursorPosRight(bool moveRight)
-	{
-		//if (moveRight && cursorPos <= createTextMessageContent.Length)
-		if (moveRight)
-		{
-			if (tempLetter != "")
-			{
-				SaveTempLetterInString();
-				tempLetter = "";
-				UpdateTextMessageContent(cursor);
-				ButtonPressManager.ResetAplhaButtonInputs();
-			}
-			else if (cursorPos >= createTextMessageContent.Length)
-			{
-				createTextMessageContent += " ";
-			}
-			//otherwise just move the cursor right one index
-			cursorPos += 1;
-			ForceCursorOn();
-		}
-		else if (cursorPos > 0)
-		{
-			if (tempLetter != "")
-			{
-				SaveTempLetterInString();
-				tempLetter = "";
-				UpdateTextMessageContent(cursor);
-				ButtonPressManager.ResetAplhaButtonInputs();
-				//save temp letter at cursor pos, but don't move the cursor along one index
-			}
-			else
-			{
-				cursorPos -= 1;
-			}
-			ForceCursorOn();
-		}
-	}
-	////////////// create a text, end ////////////////////////
 
 	public void ReadSelectedInboxText()
 	{
@@ -408,23 +269,14 @@ public class PhoneScript : MonoBehaviour {
 		outboxTexts.DeleteSelectedText ();
 	}
 
-	/*public void SetViewToInboxTextMessageOptions()
-	{
-		inboxTexts.SetViewToTextMessageOptions ();
-	}*/
-
 	public void SetViewToTextMessageOptions()
 	{
 		if (TextMessageMenu.GetState() == TextMessageMenu.TextMessageMenuState.Inbox)
 		{
-			//PhoneState.SetState (PhoneState.State.TextMessageInbox);
-			//inboxTexts.SetViewToTextMessageCollection ();
 			inboxTexts.SetViewToTextMessageOptions();
 		}
 		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Outbox)
 		{
-			//PhoneState.SetState (PhoneState.State.TextMessageOutbox);
-			//outboxTexts.SetViewToTextMessageCollection ();
 			outboxTexts.SetViewToTextMessageOptions();
 		}
 		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Create)
