@@ -21,6 +21,11 @@ public class PhoneScript : MonoBehaviour {
 	private string inboxTextsJson = "C:\\Users\\Sinead\\Documents\\Phone\\Assets\\savedData\\inboxTexts.json";
 	private TextMessageCollection outboxTexts;
 	private string outboxTextsJson = "C:\\Users\\Sinead\\Documents\\Phone\\Assets\\savedData\\outboxTexts.json";
+	private TextMessageCollection draftTexts;
+	private string draftTextsJson = "C:\\Users\\Sinead\\Documents\\Phone\\Assets\\savedData\\draftTexts.json";
+
+	//when the user has entered a text message body/contact name/etc.
+	public string newlyEnteredString = "";
 
 	public GameObject receptionIcon;
 	public Sprite hasReceptionSprite;
@@ -50,6 +55,7 @@ public class PhoneScript : MonoBehaviour {
 
 		inboxTexts = new TextMessageCollection (inboxTextsJson, TextMessageCollection.CollectionType.Inbox);
 		outboxTexts = new TextMessageCollection (outboxTextsJson, TextMessageCollection.CollectionType.Outbox);
+		draftTexts = new TextMessageCollection (draftTextsJson, TextMessageCollection.CollectionType.Drafts);
 
 		cc = new ContactsCollection ();	
 		cc.LoadSavedContacts ();
@@ -83,7 +89,7 @@ public class PhoneScript : MonoBehaviour {
 
 	}
 
-	/*void Update()
+	void Update()
 	{
 		if (hasReception && !hadRecption) 
 		{
@@ -96,7 +102,10 @@ public class PhoneScript : MonoBehaviour {
 			receptionIcon.GetComponent<SpriteRenderer> ().sprite = noReceptionSprite;
 		}
 		hadRecption = hasReception;
-	}*/
+
+		string state = Enum.GetName (typeof(PhoneState.State), PhoneState.GetState ());
+		cs.SetDebugPhoneState (state);
+	}
 
 	[RPC]
 	void UpdateText(string content)
@@ -244,9 +253,20 @@ public class PhoneScript : MonoBehaviour {
 		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Create)
 		{
 			PhoneState.SetState (PhoneState.State.TextMessageCreate);
-			//prev: no tsc
-			tsc.SetViewToTextMessageCreate();
+			tsc.SetTextArea("SetScreenText()");
+			draftTexts.SetViewToTextMessageCreate();
 		}
+		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Drafts)
+		{
+			PhoneState.SetState (PhoneState.State.TextMessageDrafts);
+			tsc.SetTextArea("SetScreenText()");
+			draftTexts.SetViewToTextMessageCollection ();
+		}
+		//else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Outbox)
+		//{
+		//	PhoneState.SetState (PhoneState.State.TextMessageOutbox);
+		//	outboxTexts.SetViewToTextMessageCollection ();
+		//}
 	}
 
 	public void ReadSelectedInboxText()
@@ -257,6 +277,16 @@ public class PhoneScript : MonoBehaviour {
 	public void ReadSelectedOutboxText()
 	{
 		outboxTexts.ReadSelectedText ();
+	}
+
+	public void ContinueEditingSelectedDraftText()
+	{
+		string draftContent = draftTexts.GetBodyOfSelectedDraftText ();
+
+		PhoneState.SetState (PhoneState.State.TextMessageCreate);
+		tsc.SetTextArea("SetScreenText()");
+		tsc.SetInitialContent (draftContent);
+		draftTexts.SetViewToTextMessageCreate();
 	}
 
 	public void DeleteSelectedInboxText()
@@ -279,11 +309,27 @@ public class PhoneScript : MonoBehaviour {
 		{
 			outboxTexts.SetViewToTextMessageOptions();
 		}
-		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Create)
+		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Create ||
+		         TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Drafts)
 		{
-			//PhoneState.SetState (PhoneState.State.TextMessageCreate);
-			//outboxTexts.SetViewToTextMessageCollection ();
-			//SetViewToTextMessageCreate("");
+			newlyEnteredString = tsc.GetCreatedString();
+			tsc.FinishInputAndReset();
+			tsc.UpdateTextMessageContent("");//clear whatever text area that we were writing to
+			draftTexts.SetViewToTextMessageOptions();
+		}
+	}
+
+	public void SetTextMessageRecipient()
+	{
+		if (TextMessageMenu.GetState () != TextMessageMenu.TextMessageMenuState.Create)
+		{
+			Debug.Log("ERROR");
+		}
+		else
+		{
+			string textContent = tsc.GetCreatedString();
+			tsc.FinishInputAndReset();
+			draftTexts.SetViewToEnterRecipient();
 		}
 	}
 
@@ -305,6 +351,16 @@ public class PhoneScript : MonoBehaviour {
 	public void OutboxScrollDown()
 	{
 		outboxTexts.ScrollDown ();
+	}
+
+	public void DraftsScrollUp()
+	{
+		draftTexts.ScrollUp ();
+	}
+
+	public void DraftsScrollDown()
+	{
+		draftTexts.ScrollDown ();
 	}
 
 	public void ContactsScrollUp()

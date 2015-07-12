@@ -22,11 +22,12 @@ public class TextMessageCollection {
 	private PhoneScript ps = (PhoneScript)GameObject.FindGameObjectWithTag("Phone").GetComponent<PhoneScript>();
 	private CanvasScript cs = (CanvasScript)GameObject.FindGameObjectWithTag ("PhoneCanvas").GetComponent<CanvasScript> ();
 	private ContactsCollection cc; //have access to the Contact list
-
+	
 	public enum CollectionType
 		{
 		Inbox,
 		Outbox,
+		Drafts,
 	};
 	private CollectionType collectionType; //the type of collection, ie inbox or output
 
@@ -227,7 +228,10 @@ public class TextMessageCollection {
 				count += 1;
 				
 			}
-			cs.SetNavRightText ("Read");
+			if (collectionType != CollectionType.Drafts)
+				cs.SetNavRightText ("Read");
+			else
+				cs.SetNavRightText ("Edit");
 		}
 		ps.HandleHasUnreadMessages ();
 		
@@ -237,19 +241,26 @@ public class TextMessageCollection {
 		{
 			PhoneState.SetState (PhoneState.State.TextMessageInbox);
 		}
-		else
+		else if (collectionType == CollectionType.Outbox)
 		{
 			PhoneState.SetState (PhoneState.State.TextMessageOutbox);
+		}
+		else if (collectionType == CollectionType.Drafts)
+		{
+			PhoneState.SetState(PhoneState.State.TextMessageDrafts);
 		}
 	}
 
 	private string GetContactFromNumber( string number, bool isTraceable)
 	{
-		string str = "";
-		if (isTraceable)
-			str = cc.GetSenderFromNumber(number);
-		else
-			str = "unknown";
+		string str = ""; //TODO: for draft texts, this will be what is returned. Is empty string or "empty" better?
+		if (number != null) //is null for draft texts
+		{
+			if (isTraceable)
+				str = cc.GetSenderFromNumber(number);
+			else
+				str = "unknown";
+		}
 		return str;
 	}
 
@@ -361,12 +372,33 @@ public class TextMessageCollection {
 		{
 			TextMessageOptions.SetViewToOutboxTextOptions();	
 		}
+		else if (collectionType == CollectionType.Drafts)
+		{
+			TextMessageOptions.SetViewToDraftTextOptions();
+		}
+	}
+
+	public void SetViewToEnterRecipient()
+	{
+
+	}
+
+	public void SetViewToTextMessageCreate()
+	{
+		cs.SetHeadingText("Create");
+		cs.SetNavLeftText("Back");
+		cs.SetNavRightText("Options");
 	}
 
 	//display the selected text
 	public void ReadSelectedText()
 	{
 		SetViewToTextMessage(texts[readTextAtIndex]);
+	}
+
+	public string GetBodyOfSelectedDraftText()
+	{
+		return texts [readTextAtIndex].GetMessage ();
 	}
 
 	//delete the selected text

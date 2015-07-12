@@ -5,7 +5,9 @@ using System;
 using System.Diagnostics;
 
 public class CanvasScript : MonoBehaviour {
-	
+
+	public Text debugPhoneState;
+
 	public Text screenText;
 	public Text receptionText;
 	public Text headingText;
@@ -49,6 +51,11 @@ public class CanvasScript : MonoBehaviour {
 			hour = "0" + hour;
 		}
 		timeText.text = hour + ":" + min;
+	}
+
+	public void SetDebugPhoneState(string state)
+	{
+		debugPhoneState.text = state;
 	}
 
 	public void ResetAllLines()

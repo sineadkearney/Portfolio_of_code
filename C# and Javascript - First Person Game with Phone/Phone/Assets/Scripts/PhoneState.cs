@@ -12,9 +12,8 @@ public class PhoneState {
 		TextMessageInbox,
 		TextMessageOutbox,
 		TextMessageDisplay, //static disply, no editing text
-		//TextMessageInboxDisplay, //displaying a text from the inbox
-		//TextMessageOutboxDisplay, // displaying a text from the outbox
 		TextMessageCreate,
+		TextMessageDrafts,
 		TextMessageOptions,
 		ContactsList,
 		ErrorMessage,

@@ -6,6 +6,8 @@ public class TextStringCreation : MonoBehaviour {
 	private CanvasScript cs;
 	private PhoneScript ps;
 
+	private string m_textArea; //the Text object in the cavnas that we are writing to
+
 	//for creating a text message
 	private string createTextMessageContent = "";
 
@@ -16,6 +18,8 @@ public class TextStringCreation : MonoBehaviour {
 		
 		GameObject phone = GameObject.FindGameObjectWithTag ("Phone");
 		ps = (PhoneScript)phone.GetComponent<PhoneScript> ();
+
+		m_textArea = "";
 	}
 	
 	//private bool showingLine = true;
@@ -23,19 +27,18 @@ public class TextStringCreation : MonoBehaviour {
 	private float timeLastBlinked = 0.0f;
 	private string cursor = "|";
 	private int cursorPos = 0;
-	private int insertAtIndex = 0;
 	// Update is called once per frame
-	void Update () { //TODO: working on
-		if (PhoneState.GetState () == PhoneState.State.TextMessageCreate)
+	void Update () { 
+		if (PhoneState.GetState () == PhoneState.State.TextMessageCreate) //TODO: there should be a more general check for this
 		{
 			float currTime = Time.time;
 			if (currTime > timeLastBlinked + blinkingTime)
 			{
 				timeLastBlinked = currTime;
 				UpdateTextMessageContent(cursor);
-				//SetViewToTextMessageCreate(cursor);
+				//SetTextOfLeftButton(cursor);
 				if (cursor == "|") 
-					cursor = "";
+					cursor = " ";
 				else 
 					cursor = "|";
 			}
@@ -43,7 +46,51 @@ public class TextStringCreation : MonoBehaviour {
 	}
 
 	//////////// create a text, start ////////////////////////
-	/// //TODO: should probably move to its own class
+	public void SetTextArea (string textArea)
+	{
+		m_textArea = textArea;
+	}
+	public string GetTextArea()
+	{
+		return m_textArea;
+	}
+	void WriteToScreen(string text)
+	{
+	switch (m_textArea) {
+		case "SetScreenText()":
+			cs.SetScreenText(text);
+			break;
+		case "SetLineContent(1)":
+			cs.SetLineContent(1, text, false);
+			break;
+		case "SetLineContent(2)":
+			cs.SetLineContent(2, text, false);
+			break;
+		case "SetLineContent(3)":
+			cs.SetLineContent(3, text, false);
+			break;
+		case "SetLineContent(4)":
+			cs.SetLineContent(4, text, false);
+			break;
+		case "SetLineContent(5)":
+			cs.SetLineContent(5, text, false);
+			break;
+		case "SetLineContent(6)":
+			cs.SetLineContent(6, text, false);
+			break;
+		default:
+			Debug.Log ("invalid m_textArea: " + m_textArea);
+			break;
+		}
+	}
+
+	//set the initial content
+	public void SetInitialContent(string content)
+	{
+		createTextMessageContent = content;
+		cursorPos = createTextMessageContent.Length;
+	}
+
 	private string tempLetter = "";
 	public void UpdateTextMessageContent(string cursor)
 	{
@@ -53,7 +100,7 @@ public class TextStringCreation : MonoBehaviour {
 		string rightString = "";
 		if (createTextMessageContent.Length > 0 && cursorPos >= 0 && cursorPos <= createTextMessageContent.Length)
 		{
-			Debug.Log ("cursorPos " + cursorPos);
+			//Debug.Log ("cursorPos " + cursorPos);
 			if (cursorPos > 0 && createTextMessageContent.Length >= cursorPos)
 				leftString = createTextMessageContent.Substring (0, cursorPos);
 			rightString = createTextMessageContent.Substring (cursorPos);
@@ -62,7 +109,8 @@ public class TextStringCreation : MonoBehaviour {
 		{
 			int i = 0;
 		}
-		cs.SetScreenText(leftString + tempLetter + cursor + rightString);
+		//cs.SetScreenText(leftString + tempLetter + cursor + rightString);
+		WriteToScreen(leftString + tempLetter + cursor + rightString);
 	}
 	
 	private void ForceCursorOn()
@@ -78,17 +126,12 @@ public class TextStringCreation : MonoBehaviour {
 		UpdateTextMessageContent(cursor);
 	}
 	
-	public void SetViewToTextMessageCreate()
+	public void SetTextOfLeftButton()
 	{
-		cs.SetHeadingText("Create");
-		
-		//cs.SetScreenText(createTextMessageContent + newLetter);
-		
 		if (createTextMessageContent == "")
 			cs.SetNavLeftText("Back");
 		else
 			cs.SetNavLeftText("Delete");
-		cs.SetNavRightText("Send");
 	}
 	
 	public void SetNewTextMessageContent(string newLetter)
@@ -97,7 +140,7 @@ public class TextStringCreation : MonoBehaviour {
 		SaveTempLetterInString ();
 		cursorPos += 1; //increase cursorPos now that they've added a char to the string
 		tempLetter = "";
-		SetViewToTextMessageCreate ();
+		SetTextOfLeftButton ();
 	}
 	
 	private void SaveTempLetterInString()
@@ -106,7 +149,7 @@ public class TextStringCreation : MonoBehaviour {
 		string rightString = "";
 		if (createTextMessageContent.Length > 0 && cursorPos >= 0 && cursorPos <= createTextMessageContent.Length)
 		{
-			Debug.Log ("cursorPos " + cursorPos);
+			//Debug.Log ("cursorPos " + cursorPos);
 			if (cursorPos > 0 && createTextMessageContent.Length >= cursorPos)
 				leftString = createTextMessageContent.Substring (0, cursorPos);
 			rightString = createTextMessageContent.Substring (cursorPos);
@@ -117,39 +160,36 @@ public class TextStringCreation : MonoBehaviour {
 		}
 		createTextMessageContent = leftString + tempLetter + rightString;
 	}
-	
-	public void TextMessageCreateHandleCancel()
+
+	public int GetCreationStringLength()
 	{
-		if (createTextMessageContent == "")
-		{
-			ps.SetViewToSubMainMenu();
-		}
-		else //delete the char behind the cursor
-		{
-			if (tempLetter != "")
-			{
-				//SaveTempLetterInString();
-				tempLetter = "";
-				//cursorPos -= 1;
-			}
-			else if (cursorPos > 0)
-			{
-				//createTextMessageContent = createTextMessageContent.Substring (0, createTextMessageContent.Length - 1);
-				string leftString = "";
-				string rightString = "";
-				leftString = createTextMessageContent.Substring (0, cursorPos-1);
-				rightString = createTextMessageContent.Substring (cursorPos);
-				createTextMessageContent = leftString+rightString;
-				cursorPos -= 1;
-			}
-			
-			SetViewToTextMessageCreate ();
-			UpdateTextMessageContent(cursor);
-			ButtonPressManager.ResetAplhaButtonInputs();
-		}
+		return createTextMessageContent.Length;
 	}
-	
-	
+
+	public void DeleteCharAtCursorPos()
+	{
+		if (tempLetter != "")
+		{
+			//SaveTempLetterInString();
+			tempLetter = "";
+			//cursorPos -= 1;
+		}
+		else if (cursorPos > 0)
+		{
+			//createTextMessageContent = createTextMessageContent.Substring (0, createTextMessageContent.Length - 1);
+			string leftString = "";
+			string rightString = "";
+			leftString = createTextMessageContent.Substring (0, cursorPos-1);
+			rightString = createTextMessageContent.Substring (cursorPos);
+			createTextMessageContent = leftString+rightString;
+			cursorPos -= 1;
+		}
+		
+		SetTextOfLeftButton ();
+		UpdateTextMessageContent(cursor);
+		ButtonPressManager.ResetAplhaButtonInputs();
+	}
+
 	public void MoveCursorPosRight(bool moveRight)
 	{
 		//if (moveRight && cursorPos <= createTextMessageContent.Length)
@@ -187,6 +227,21 @@ public class TextStringCreation : MonoBehaviour {
 			ForceCursorOn();
 		}
 	}
-	////////////// create a text, end ////////////////////////
+
+
+	
+	public string GetCreatedString()
+	{
+		return createTextMessageContent;
+	}
+
+	//when we no longer want to allow user input
+	public void FinishInputAndReset()
+	{
+		cursor = "";
+		createTextMessageContent = "";
+		ButtonPressManager.ResetAplhaButtonInputs();
+		cursorPos = 0;
+	}
 
 }

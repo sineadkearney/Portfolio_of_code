@@ -57,15 +57,15 @@ public class ButtonPressManager: MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		alphaInput[0] = new string[] {" "};
-		alphaInput [1] = new string[] {".", ",", "'", "\"", "?", "!", ":", ";", "-", "_", "(", ")" };
-		alphaInput [2] = new string[] {"a", "b", "c", "A", "B", "C"};
-		alphaInput [3] = new string[]{"d", "e", "f", "D", "E", "F"};
-		alphaInput [4] = new string[]{"g", "h", "i", "G", "H", "I"};
-		alphaInput [5] = new string[]{"j", "k", "l", "J", "K", "L"};
-		alphaInput [6] = new string[]{"m", "n", "o", "M", "N", "O"};
-		alphaInput [7] = new string[]{"p", "q", "r", "s", "P", "Q", "R", "S"};
-		alphaInput [8] = new string[]{"t", "u", "v", "T", "U", "V"};
-		alphaInput [9] = new string[]{"w", "x", "y", "z", "W", "X", "Y", "Z"};
+		alphaInput [1] = new string[] {".", ",", "'", "\"", "?", "!", ":", ";", "-", "_", "(", ")", "1" };
+		alphaInput [2] = new string[] {"a", "b", "c", "A", "B", "C", "2"};
+		alphaInput [3] = new string[]{"d", "e", "f", "D", "E", "F", "3"};
+		alphaInput [4] = new string[]{"g", "h", "i", "G", "H", "I", "4"};
+		alphaInput [5] = new string[]{"j", "k", "l", "J", "K", "L", "5"};
+		alphaInput [6] = new string[]{"m", "n", "o", "M", "N", "O", "6"};
+		alphaInput [7] = new string[]{"p", "q", "r", "s", "P", "Q", "R", "S", "7"};
+		alphaInput [8] = new string[]{"t", "u", "v", "T", "U", "V", "8"};
+		alphaInput [9] = new string[]{"w", "x", "y", "z", "W", "X", "Y", "Z", "9"};
 
 		GameObject canvas = GameObject.FindGameObjectWithTag ("PhoneCanvas");
 		cs = (CanvasScript) canvas.GetComponent<CanvasScript>();
@@ -242,11 +242,21 @@ public class ButtonPressManager: MonoBehaviour {
 			switch (btn)
 			{
 				case Button.Enter:
-					Debug.Log("Send");
+					//Debug.Log("Send");
+					ps.SetViewToTextMessageOptions();
 					break;
 				case Button.Cancel:
-					//ps
-					tsc.TextMessageCreateHandleCancel();
+					int creationStringLength = tsc.GetCreationStringLength();
+					if (creationStringLength == 0)
+					{
+						tsc.SetTextArea("");
+						ps.SetViewToSubMainMenu();
+					}
+					else
+					{
+						tsc.DeleteCharAtCursorPos();
+					}
+						
 					break;
 				case Button.Zero:
 					//Debug.Log (Time.time);
@@ -350,6 +360,32 @@ public class ButtonPressManager: MonoBehaviour {
 				ps.ResetAndSetViewToHomeScreen();
 			}
 			break;
+		case PhoneState.State.TextMessageDrafts:
+			
+			cs.ResetAllLines ();
+			cs.SetScreenText ("");
+			
+			if (btn == Button.Enter)
+			{
+				ps.ContinueEditingSelectedDraftText();
+			}
+			else if ( btn == Button.Cancel)
+			{
+				ps.SetViewToSubMainMenu();
+			}
+			else if (btn == Button.Up)
+			{
+				ps.DraftsScrollUp();
+			}
+			else if (btn == Button.Down)
+			{
+				ps.DraftsScrollDown();
+			}
+			else if (btn == Button.HangUp)
+			{
+				ps.ResetAndSetViewToHomeScreen();
+			}
+			break;
 			
 		//case PhoneState.State.TextMessageInboxDisplay:
 		case PhoneState.State.TextMessageDisplay:	
@@ -445,6 +481,6 @@ public class ButtonPressManager: MonoBehaviour {
 			break;
 		}
 		timeAtLastInput = Time.time;
-		Debug.Log (timeAtLastInput);
+		//Debug.Log (timeAtLastInput);
 	}
 }
