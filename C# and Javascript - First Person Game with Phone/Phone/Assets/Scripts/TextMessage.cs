@@ -14,7 +14,10 @@ public class TextMessage {
 
 	public TextMessage(string sender, string recipient, string message, string timestamp, bool isRead, bool isTraceable)
 	{
-		m_timestamp = Convert.ToInt64(timestamp);
+		if (timestamp == "")
+			m_timestamp = System.DateTime.Now.Ticks;
+		else
+			m_timestamp = Convert.ToInt64(timestamp);
 		m_sender = sender;
 		m_recipient = recipient;
 		m_message = message;
@@ -29,6 +32,7 @@ public class TextMessage {
 		m_message = message;
 	}
 
+	//this is when we receive a text, from the first-person game
 	public TextMessage(string str)
 	{
 		Debug.Log ("str: " + str);
@@ -92,11 +96,15 @@ public class TextMessage {
 		m_read = value;
 	}
 
+	public void SetRecipient(string recipient)
+	{
+		m_recipient = recipient;
+	}
+
 	public string ToString()
 	{
 		string str = "{\"timestamp\": " + m_timestamp + ", \"sender\": \"" + m_sender + "\", \"message\": \"" + m_message + "\"}";
 		return str;
 	}
-
 
 }

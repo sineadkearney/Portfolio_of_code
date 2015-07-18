@@ -18,11 +18,12 @@ public class PhoneScript : MonoBehaviour {
 	private string homeScreenTextContent;
 
 	private TextMessageCollection inboxTexts;
-	private string inboxTextsJson = "C:\\Users\\Sinead\\Documents\\Phone\\Assets\\savedData\\inboxTexts.json";
+	private string inboxTextsJson = "D:\\Unity Projects\\Phone\\Assets\\savedData\\inboxTexts.json";
 	private TextMessageCollection outboxTexts;
-	private string outboxTextsJson = "C:\\Users\\Sinead\\Documents\\Phone\\Assets\\savedData\\outboxTexts.json";
-	private TextMessageCollection draftTexts;
-	private string draftTextsJson = "C:\\Users\\Sinead\\Documents\\Phone\\Assets\\savedData\\draftTexts.json";
+	private string outboxTextsJson = "D:\\Unity Projects\\Phone\\Assets\\savedData\\outboxTexts.json";
+	public TextMessageCollection draftTexts; //accessed in TextMessageOptions
+	private string draftTextsJson = "D:\\Unity Projects\\Phone\\Assets\\savedData\\draftTexts.json";
+	public TextMessageCollection newlyWrittenText; //this is for creating a new text only
 
 	//when the user has entered a text message body/contact name/etc.
 	public string newlyEnteredString = "";
@@ -42,6 +43,8 @@ public class PhoneScript : MonoBehaviour {
 	public bool hasReception = false;
 	private float creditAmount = 0.0f;
 
+	private string savedInput = "";
+
 	// Use this for initialization
 	//TurnOnPhone()
 	void Start () {
@@ -56,6 +59,7 @@ public class PhoneScript : MonoBehaviour {
 		inboxTexts = new TextMessageCollection (inboxTextsJson, TextMessageCollection.CollectionType.Inbox);
 		outboxTexts = new TextMessageCollection (outboxTextsJson, TextMessageCollection.CollectionType.Outbox);
 		draftTexts = new TextMessageCollection (draftTextsJson, TextMessageCollection.CollectionType.Drafts);
+		newlyWrittenText = new TextMessageCollection ("", TextMessageCollection.CollectionType.Create);
 
 		cc = new ContactsCollection ();	
 		cc.LoadSavedContacts ();
@@ -115,7 +119,6 @@ public class PhoneScript : MonoBehaviour {
 	}
 
 	//if in the main menu, show a message that we have a new text/have no new texts
-	//show "Δ" in the top right of the screen if we have unread texts
 	public void HandleHasUnreadMessages()
 	{
 		if (hasUnreadTexts)
@@ -228,6 +231,12 @@ public class PhoneScript : MonoBehaviour {
 		}
 	}
 
+	public void ShowAllContactsForPossibleTextRecipient()
+	{
+		cc.ShowAllContactsForPossibleTextRecipient();
+	}
+
+
 	public void TextMessMenuScrollUp()
 	{
 		tmm.ScrollUp ();
@@ -254,7 +263,8 @@ public class PhoneScript : MonoBehaviour {
 		{
 			PhoneState.SetState (PhoneState.State.TextMessageCreate);
 			tsc.SetTextArea("SetScreenText()");
-			draftTexts.SetViewToTextMessageCreate();
+			//draftTexts.SetViewToTextMessageCreate();
+			newlyWrittenText.SetViewToTextMessageCreate();
 		}
 		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Drafts)
 		{
@@ -262,11 +272,12 @@ public class PhoneScript : MonoBehaviour {
 			tsc.SetTextArea("SetScreenText()");
 			draftTexts.SetViewToTextMessageCollection ();
 		}
-		//else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Outbox)
-		//{
-		//	PhoneState.SetState (PhoneState.State.TextMessageOutbox);
-		//	outboxTexts.SetViewToTextMessageCollection ();
-		//}
+	}
+
+	//TODO: when we are writing a text, then go to options
+	public void GoBackToEditText()
+	{
+		//newlyWrittenText.SetViewToTextMessageCreate();
 	}
 
 	public void ReadSelectedInboxText()
@@ -282,11 +293,24 @@ public class PhoneScript : MonoBehaviour {
 	public void ContinueEditingSelectedDraftText()
 	{
 		string draftContent = draftTexts.GetBodyOfSelectedDraftText ();
-
 		PhoneState.SetState (PhoneState.State.TextMessageCreate);
 		tsc.SetTextArea("SetScreenText()");
 		tsc.SetInitialContent (draftContent);
 		draftTexts.SetViewToTextMessageCreate();
+		//TODO: this is saying "back" when it should say "delete"
+	}
+
+	public void GoBackToEditingNewMessageOrDraft(bool isDraft)
+	{
+		PhoneState.SetState (PhoneState.State.TextMessageCreate);
+		tsc.SetTextArea("SetScreenText()");
+		tsc.SetInitialContent (savedInput);
+
+		//TODO: probably don't need this if checks
+		if (isDraft)
+			draftTexts.SetViewToTextMessageCreate();
+		else
+			newlyWrittenText.SetViewToTextMessageCreate();
 	}
 
 	public void DeleteSelectedInboxText()
@@ -298,7 +322,10 @@ public class PhoneScript : MonoBehaviour {
 	{
 		outboxTexts.DeleteSelectedText ();
 	}
-
+	public void DeleteSelectedDraftsText()
+	{
+		draftTexts.DeleteSelectedText ();
+	}
 	public void SetViewToTextMessageOptions()
 	{
 		if (TextMessageMenu.GetState() == TextMessageMenu.TextMessageMenuState.Inbox)
@@ -309,30 +336,60 @@ public class PhoneScript : MonoBehaviour {
 		{
 			outboxTexts.SetViewToTextMessageOptions();
 		}
-		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Create ||
-		         TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Drafts)
+		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Create)
 		{
-			newlyEnteredString = tsc.GetCreatedString();
+			savedInput = tsc.GetCreatedString();
+			
+			//temporarily save the string in case we are sending it, or saving it to drafts
+			TextMessageOptions.SetNewTextContent(savedInput); 
+			
+			tsc.FinishInputAndReset();
+			tsc.UpdateTextMessageContent("");//clear whatever text area that we were writing to
+			newlyWrittenText.SetViewToTextMessageOptions();
+		}
+		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Drafts)
+		{
+			savedInput = tsc.GetCreatedString();
+
+			//temporarily save the string in case we are sending it, or saving it to drafts
+			TextMessageOptions.SetNewTextContent(savedInput); 
+
 			tsc.FinishInputAndReset();
 			tsc.UpdateTextMessageContent("");//clear whatever text area that we were writing to
 			draftTexts.SetViewToTextMessageOptions();
 		}
 	}
 
-	public void SetTextMessageRecipient()
+	public void SelectContactAsTextRecipient()
 	{
-		if (TextMessageMenu.GetState () != TextMessageMenu.TextMessageMenuState.Create)
-		{
-			Debug.Log("ERROR");
-		}
-		else
-		{
-			string textContent = tsc.GetCreatedString();
-			tsc.FinishInputAndReset();
-			draftTexts.SetViewToEnterRecipient();
-		}
+		Contact textRecipient = cc.SelectContactAsTextRecipient ();
+		TextMessage savedText = TextMessageOptions.GetSavedText ();
+
+		savedText.SetRecipient (textRecipient.GetNumber());
+		SendText ();
+		SetViewToMainMenu ();
 	}
 
+	public void EnterNumberAsTextRecipient()
+	{
+		PhoneState.SetState (PhoneState.State.NumberTextRecipient);
+		tsc.SetTextArea("SetScreenText()");
+		tsc.SetInitialContent ("");
+
+		/*string numberEntered = "";
+		TextMessage savedText = TextMessageOptions.GetSavedText ();
+		savedText.SetRecipient (numberEntered);
+		SendText ();
+		SetViewToMainMenu ();*/
+	}
+
+	public void SendText()
+	{
+		//TODO: check has credit, check has reception
+
+		Debug.Log ("send text");
+
+	}
 	public void InboxScrollUp()
 	{
 		inboxTexts.ScrollUp ();

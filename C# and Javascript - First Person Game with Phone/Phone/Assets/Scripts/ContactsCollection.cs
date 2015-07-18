@@ -21,7 +21,7 @@ public class ContactsCollection {
 
 	//contacts data file
 	// System.IO.File.WriteAllText("C:\blahblah_yourfilepath\yourtextfile.txt", "This is text that goes into the text file");
-	private string fileName = "C:\\Users\\Sinead\\Documents\\Phone\\Assets\\savedData\\contacts.json";
+	private string fileName = "D:\\Unity Projects\\Phone\\Assets\\savedData\\contacts.json";
 	private string fileData = "";
 	private JSONNode savedContacts;
  
@@ -138,7 +138,7 @@ public class ContactsCollection {
 		PhoneState.SetState (PhoneState.State.ContactsList);
 		int index = 1;
 		int count = 0;
-		ps.hasUnreadTexts = false;
+		//ps.hasUnreadTexts = false;
 		
 		if (contactsLength == 0) 
 		{
@@ -165,7 +165,46 @@ public class ContactsCollection {
 		
 		cs.SetHeadingText("Contacts");
 		cs.SetNavLeftText ("Back");
+	}
+
+	public void ShowAllContactsForPossibleTextRecipient()
+	{
+		PhoneState.SetState (PhoneState.State.ContactsListTextRecipient);
+		int index = 1;
+		int count = 0;
+		//ps.hasUnreadTexts = false;
 		
+		if (contactsLength == 0) 
+		{
+			cs.SetLineContent(index, "No Contacts", false);
+			cs.SetNavRightText ("");
+		}
+		else
+		{
+			foreach (Contact contact in contacts)
+			{
+				if (count >= lowerIndexContactInView && count <= upperIndexContactInView)
+				{
+					contact.SetSelected (index == selectedContactIndex+1);
+					string str = contact.GetName () + ": "+ contact.GetNumber();
+					cs.SetLineContent(index, str, contact.IsSelected());
+					index += 1;
+				}
+				count += 1;
+				
+			}
+			cs.SetNavRightText ("Select");
+		}
+		//ps.HandleHasUnreadMessages ();
+		
+		cs.SetHeadingText("Send to contact");
+		cs.SetNavLeftText ("Back");
+	}
+
+	public Contact SelectContactAsTextRecipient()
+	{
+		//TODO: check that contacts is not empty
+		return contacts [selectedContactIndex];
 	}
 
 	public void SetUpperIndexContactInViewToTop()
@@ -220,7 +259,10 @@ public class ContactsCollection {
 			
 		}
 		
-		SetViewToContactCollection();
+		if (PhoneState.GetState() == PhoneState.State.ContactsList)
+			SetViewToContactCollection();
+		else //if (PhoneState.GetState() == PhoneState.State.ContactsListTextRecipient)
+			ShowAllContactsForPossibleTextRecipient();
 	}
 	
 	public void ScrollDown()
@@ -244,8 +286,11 @@ public class ContactsCollection {
 			readContactAtIndex += 1;
 			selectedContactIndex += 1;
 		}
-		
-		SetViewToContactCollection();
+
+		if (PhoneState.GetState() == PhoneState.State.ContactsList)
+			SetViewToContactCollection();
+		else //if (PhoneState.GetState() == PhoneState.State.ContactsListTextRecipient)
+			ShowAllContactsForPossibleTextRecipient();
 	}
 
 	public string GetSenderFromNumber(string number)

@@ -36,9 +36,9 @@ public class ButtonPressManager: MonoBehaviour {
 
 	static int prevAlphaInputButtonIndex = -1; //0 -> 9
 	static int alphaInputButtonIndex = -1; //0 -> 9
-	static int alphaInputIndex = -1; // 0->...
+	static int alphaInputIndex = -1; // 0-> 3 (4 for pqrs), ~9 for .,?![etc]
 	static bool alphaInputPressed = false;
-	//string[][] alphaInput = new string [0][0];
+	static bool inAlphaInputMode = true; //can we write letters & numbers (true), or just numbers (false) 
 	string[][] alphaInput = new string[10][];
 
 		/*{" "}, 
@@ -51,6 +51,7 @@ public class ButtonPressManager: MonoBehaviour {
 		{"p", "q", "r", "s", "P", "Q", "R", "S"},
 		{"t", "u", "v", "T", "U", "V"},
 		{"w", "x", "y", "z", "W", "X", "Y", "Z"}};*/
+	//selected using alphaInput[alphaInputButtonIndex][alphaInputIndex]
 
 
 	//private PhoneState state;
@@ -95,19 +96,33 @@ public class ButtonPressManager: MonoBehaviour {
 	{
 		alphaInputButtonIndex = buttonNum;
 
-		if (prevAlphaInputButtonIndex != -1 && alphaInputButtonIndex != prevAlphaInputButtonIndex) //prevAlphaInputButtonIndex value handled in Update()
+		if (inAlphaInputMode)
 		{
+			if (prevAlphaInputButtonIndex != -1 && alphaInputButtonIndex != prevAlphaInputButtonIndex) //prevAlphaInputButtonIndex value handled in Update()
+			{
+				//if (!inAlphaInputMode)
+				//	alphaInputIndex = alphaInput[prevAlphaInputButtonIndex].Length-1; //get the last index, because we want to input the number
+
+				//ps
+				tsc.SetNewTextMessageContent(alphaInput[prevAlphaInputButtonIndex][alphaInputIndex]); //save the prev letter
+				alphaInputIndex = 0;
+			}
+			else
+			{
+				alphaInputIndex = (alphaInputIndex + 1 ) % alphaInput[alphaInputButtonIndex].Length;
+
+			}
 			//ps
-			tsc.SetNewTextMessageContent(alphaInput[prevAlphaInputButtonIndex][alphaInputIndex]); //save the prev letter
-			alphaInputIndex = 0;
+			tsc.AddTempLetterToText(alphaInput[alphaInputButtonIndex][alphaInputIndex]);
 		}
 		else
 		{
-			alphaInputIndex = (alphaInputIndex + 1 ) % alphaInput[alphaInputButtonIndex].Length;
-
+			alphaInputIndex = alphaInput[alphaInputButtonIndex].Length-1; //get the last index, because we want to input the number
+			tsc.SetNewTextMessageContent(alphaInput[alphaInputButtonIndex][alphaInputIndex]); //save the prev letter
+			alphaInputIndex = 0;
+			//TODO: there's a lag in this, between when the button is pressed to when it appears onscreen. This should be instint
+			//this is probably due to the update function in Update only running every ~1 second
 		}
-		//ps
-		tsc.AddTempLetterToText(alphaInput[alphaInputButtonIndex][alphaInputIndex]);
 		prevAlphaInputButtonIndex = alphaInputButtonIndex;
 		alphaInputPressed = true;
 	}
@@ -122,7 +137,7 @@ public class ButtonPressManager: MonoBehaviour {
 	
 	public void ButtonInput(int num)
 	{
-
+		//TODO: reset and set screen text for valid inputs only. Ignore invalid inputs
 
 		//use switch by state. Then handle button input in each case
 		Button btn = (Button)num;
@@ -302,6 +317,9 @@ public class ButtonPressManager: MonoBehaviour {
 					//ps	
 					tsc.MoveCursorPosRight(true);
 					break;
+			case Button.Hash:
+					inAlphaInputMode = !inAlphaInputMode;
+					break;
 				default:
 					Debug.Log ("Incorrect state.");
 					break;
@@ -447,6 +465,33 @@ public class ButtonPressManager: MonoBehaviour {
 			else if ( btn == Button.Cancel)
 			{
 				ps.SetViewToMainMenu();
+			}
+			else if (btn == Button.Up)
+			{
+				ps.ContactsScrollUp();
+			}
+			else if (btn == Button.Down)
+			{
+				ps.ContactsScrollDown();
+			}
+			else if (btn == Button.HangUp)
+			{
+				ps.ResetAndSetViewToHomeScreen();
+			}
+			break;
+		case PhoneState.State.ContactsListTextRecipient:
+			
+			cs.ResetAllLines ();
+			cs.SetScreenText ("");
+			
+			if (btn == Button.Enter)
+			{
+				ps.SelectContactAsTextRecipient();
+			}
+			else if ( btn == Button.Cancel)
+			{
+				//ps.SetViewToMainMenu();
+				Debug.Log ("cancel");
 			}
 			else if (btn == Button.Up)
 			{

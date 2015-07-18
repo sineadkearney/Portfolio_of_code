@@ -8,6 +8,7 @@ public class TextStringCreation : MonoBehaviour {
 
 	private string m_textArea; //the Text object in the cavnas that we are writing to
 
+	private bool alphaInput = true; //can we write letters & numbers (true), or just numbers (false) 
 	//for creating a text message
 	private string createTextMessageContent = "";
 
@@ -229,15 +230,21 @@ public class TextStringCreation : MonoBehaviour {
 	}
 
 
-	
+	//get the inputted string. Here we added any tempLetter to createTextMessageContent and set tempLetter back to ""
 	public string GetCreatedString()
 	{
+		if (tempLetter != "")
+		{
+			SaveTempLetterInString (); 
+			tempLetter = "";
+		}
 		return createTextMessageContent;
 	}
 
 	//when we no longer want to allow user input
 	public void FinishInputAndReset()
 	{
+		tempLetter = "";
 		cursor = "";
 		createTextMessageContent = "";
 		ButtonPressManager.ResetAplhaButtonInputs();

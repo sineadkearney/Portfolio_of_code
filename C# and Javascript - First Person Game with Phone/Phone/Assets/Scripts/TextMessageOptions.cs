@@ -19,139 +19,209 @@ public static class TextMessageOptions {
 	private static CanvasScript cs = (CanvasScript)GameObject.FindGameObjectWithTag ("PhoneCanvas").GetComponent<CanvasScript> ();
 	private static ContactsCollection cc; //have access to the Contact list
 
-	//TODO: have this enum as the enum in TextMessageCollection. I don't want to have two instances
-	public enum CollectionType
+	private static TextMessageCollection.CollectionType m_collectionType;
+
+	private static string m_newTextMessageContent = "";
+	private static string m_newTextMessageRecipient = "";
+
+	private static TextMessage savedText;
+
+	public static void SetViewToTextOptions(TextMessageCollection.CollectionType collectionType)
 	{
-		Inbox,
-		Outbox,
-		//Create,
-		Drafts
-	};
+		if (collectionType == TextMessageCollection.CollectionType.Inbox)
+		{
+			cs.ResetAllLines ();
+			cs.SetLineContent (1, "Reply", selectOptionAtIndex == 0);
+			cs.SetLineContent (2, "Delete", selectOptionAtIndex == 1);
+			PhoneState.SetState(PhoneState.State.TextMessageOptions);
+			indexOfTextInOptions = selectOptionAtIndex;
+			cs.SetNavLeftText ("Back");
+			cs.SetNavRightText ("Select");
+			m_collectionType = TextMessageCollection.CollectionType.Inbox;
+			
+			lowerIndexTextInView = 0;
+			upperIndexTextInView = 1;
+			optionsAmount = 2;
+		}
+		else if (collectionType == TextMessageCollection.CollectionType.Outbox)
+		{
+			cs.ResetAllLines ();
+			cs.SetLineContent (1, "Delete", selectOptionAtIndex == 0);
+			PhoneState.SetState(PhoneState.State.TextMessageOptions);
+			indexOfTextInOptions = selectOptionAtIndex;
+			cs.SetNavLeftText ("Back");
+			cs.SetNavRightText ("Select");
+			m_collectionType = TextMessageCollection.CollectionType.Outbox;
+			
+			lowerIndexTextInView = 0;
+			upperIndexTextInView = 0;
+			optionsAmount = 1;
+		}
+		else if (collectionType == TextMessageCollection.CollectionType.Drafts)
+		{
+			cs.ResetAllLines ();
+			cs.SetLineContent (1, "Enter contact", selectOptionAtIndex == 0);
+			cs.SetLineContent (2, "Enter number", selectOptionAtIndex == 1);
+			cs.SetLineContent (3, "Save draft and quit", selectOptionAtIndex == 2);
+			cs.SetLineContent (4, "Back to drafts menu", selectOptionAtIndex == 3);
+			cs.SetLineContent (5, "Delete draft", selectOptionAtIndex == 4);
+			PhoneState.SetState(PhoneState.State.TextMessageOptions);
+			indexOfTextInOptions = selectOptionAtIndex;
+			cs.SetNavLeftText ("Back");
+			cs.SetNavRightText ("Select");
+			//m_collectionType = CollectionType.Create;
+			m_collectionType = TextMessageCollection.CollectionType.Drafts;
 
-	private static CollectionType collectionType; //the type of collection, ie inbox or output
-
-	//display the options menu for a text from the inbox
-	public static void SetViewToInboxTextOptions()
-	{
-		cs.ResetAllLines ();
-		cs.SetLineContent (1, "Reply", selectOptionAtIndex == 0);
-		cs.SetLineContent (2, "Delete", selectOptionAtIndex == 1);
-		PhoneState.SetState(PhoneState.State.TextMessageOptions);
-		indexOfTextInOptions = selectOptionAtIndex;
-		cs.SetNavLeftText ("Back");
-		cs.SetNavRightText ("Select");
-		collectionType = CollectionType.Inbox;
-
-		lowerIndexTextInView = 0;
-		upperIndexTextInView = 1;
-		optionsAmount = 2;
+			lowerIndexTextInView = 0;
+			upperIndexTextInView = 0;
+			optionsAmount = 5;
+		}
+		else if (collectionType == TextMessageCollection.CollectionType.Create)
+		{
+			cs.ResetAllLines ();
+			cs.SetLineContent (1, "Select from contacts", selectOptionAtIndex == 0);
+			cs.SetLineContent (2, "Enter number", selectOptionAtIndex == 1);
+			cs.SetLineContent (3, "Save to drafts and quit", selectOptionAtIndex == 2);
+			cs.SetLineContent (4, "Back to message", selectOptionAtIndex == 3);
+			PhoneState.SetState(PhoneState.State.TextMessageOptions);
+			indexOfTextInOptions = selectOptionAtIndex;
+			cs.SetNavLeftText ("Back");
+			cs.SetNavRightText ("Select");
+			m_collectionType = TextMessageCollection.CollectionType.Create;
+			
+			lowerIndexTextInView = 0;
+			upperIndexTextInView = 0;
+			optionsAmount = 4;
+		}
 	}
 
-	//display the options menu for a text from the outbox
-	public static void SetViewToOutboxTextOptions()
+	public static void SelectEnter()
 	{
-		cs.ResetAllLines ();
-		cs.SetLineContent (1, "Delete", selectOptionAtIndex == 0);
-		PhoneState.SetState(PhoneState.State.TextMessageOptions);
-		indexOfTextInOptions = selectOptionAtIndex;
-		cs.SetNavLeftText ("Back");
-		cs.SetNavRightText ("Select");
-		collectionType = CollectionType.Outbox;
+		savedText = new TextMessage("me", "", m_newTextMessageContent, "", true, true);
 
-		lowerIndexTextInView = 0;
-		upperIndexTextInView = 0;
-		optionsAmount = 1;
+		if (m_collectionType == TextMessageCollection.CollectionType.Inbox)
+		{
+			if (selectOptionAtIndex == 0) //reply
+			{
+				Debug.Log ("reply");
+			}
+			else if (selectOptionAtIndex == 1) //delete
+			{
+				DeleteTextViaOptions();
+			}
+		}
+		else if (m_collectionType == TextMessageCollection.CollectionType.Outbox)
+		{
+			if (selectOptionAtIndex == 0) //delete
+			{
+				DeleteTextViaOptions();
+			}
+		}
+		else if (m_collectionType == TextMessageCollection.CollectionType.Drafts)
+		{
+			if (selectOptionAtIndex == 0) //enter contact
+			{
+				Debug.Log ("Select from contacts");
+				ps.ShowAllContactsForPossibleTextRecipient();
+			}
+			else if (selectOptionAtIndex == 1) //enter number
+			{
+				Debug.Log ("enter number");
+				//ps.EnterNumberAsTextRecipient();
+			}
+			else if (selectOptionAtIndex == 2)
+			{
+				Debug.Log ("Save draft and quit");
+
+				//public TextMessage(string sender, string recipient, string message, string timestamp, bool isRead, bool isTraceable)
+				
+				//TODO: what if we are over-writing an old draft text? This will just add a new one
+				ps.draftTexts.AddTextToTexts(savedText, true);
+				//sps.SetViewToSubMainMenu();
+				ps.SetViewToTextMessageCollection();
+			}
+			else if (selectOptionAtIndex == 3)
+			{
+				Debug.Log ("Back to drafts menu");
+				ps.SetViewToTextMessageCollection();
+			}
+			else if (selectOptionAtIndex == 4)
+			{
+				Debug.Log ("delete draft");
+				DeleteTextViaOptions();
+			}
+		}
+		else if (m_collectionType == TextMessageCollection.CollectionType.Create)
+		{
+
+			if (selectOptionAtIndex == 0)
+			{
+				Debug.Log ("Select from contacts");
+				ps.ShowAllContactsForPossibleTextRecipient();
+			}
+			else if (selectOptionAtIndex == 1)
+			{
+				Debug.Log ("enter number");
+				//ps.EnterNumberAsTextRecipient();
+			}
+			else if (selectOptionAtIndex == 2) //save and quit
+			{
+				Debug.Log ("save to drafts and quit");
+				//public TextMessage(string sender, string recipient, string message, string timestamp, bool isRead, bool isTraceable)
+				
+				//TODO: what if we are over-writing an old draft text? This will just add a new one
+				ps.draftTexts.AddTextToTexts(savedText, true);
+				ps.SetViewToSubMainMenu();
+			}
+			else if (selectOptionAtIndex == 3) //Back to message
+			{
+				Debug.Log ("Quit to message menu");
+				ps.SetViewToSubMainMenu();
+			}
+		}
 	}
 
-	//display the options menu for a text from the draft/currently bring written text
-	public static void SetViewToDraftTextOptions()
+	public static TextMessage GetSavedText()
 	{
-		cs.ResetAllLines ();
-		cs.SetLineContent (1, "Enter contact", selectOptionAtIndex == 0);
-		cs.SetLineContent (2, "Enter number", selectOptionAtIndex == 1);
-		cs.SetLineContent (3, "Save and quit", selectOptionAtIndex == 2);
-		cs.SetLineContent (4, "Quit without saving", selectOptionAtIndex == 3);
-		PhoneState.SetState(PhoneState.State.TextMessageOptions);
-		indexOfTextInOptions = selectOptionAtIndex;
-		cs.SetNavLeftText ("Back");
-		cs.SetNavRightText ("Select");
-		//collectionType = CollectionType.Create;
-		collectionType = CollectionType.Drafts;
-		
-		lowerIndexTextInView = 0;
-		upperIndexTextInView = 0;
-		optionsAmount = 4;
-	}
-
-	public static void EnterTextRecipient()
-	{
-	
+		return savedText;
 	}
 
 	public static void SetViewBackToText()
 	{
-		if (collectionType == CollectionType.Inbox)
+		if (m_collectionType == TextMessageCollection.CollectionType.Inbox)
 		{
 			ps.ReadSelectedInboxText();
 		}
-		else if (collectionType == CollectionType.Outbox)
+		else if (m_collectionType == TextMessageCollection.CollectionType.Outbox)
 		{
 			ps.ReadSelectedOutboxText();
+		}
+		else if (m_collectionType == TextMessageCollection.CollectionType.Create)
+		{
+			ps.GoBackToEditingNewMessageOrDraft(false);
+		}
+		else if (m_collectionType == TextMessageCollection.CollectionType.Drafts)
+		{
+			ps.GoBackToEditingNewMessageOrDraft(true);
 		}
 	}
 
 	public static void DeleteTextViaOptions()
 	{
-		if (collectionType == CollectionType.Inbox)
+		if (m_collectionType == TextMessageCollection.CollectionType.Inbox)
 		{
 			ps.DeleteSelectedInboxText();
 		}
-		else if (collectionType == CollectionType.Outbox)
+		else if (m_collectionType == TextMessageCollection.CollectionType.Outbox)
 		{
 			ps.DeleteSelectedOutboxText();
 		}
+		else if (m_collectionType == TextMessageCollection.CollectionType.Drafts)
+		{
+			ps.DeleteSelectedDraftsText();
+		}
 	}
-	//delete the selected text
-	/*public void DeleteSelectedText()
-	{
-		DeleteTextFromTexts(indexOfTextInOptions);
-		SetViewToTextMessageCollection();
-	}
-
-	//TODO: deleting from outbox seems to delete the correspondin inbox text instead
-	//delete a text from texts, and from the json file storing the texts
-	void DeleteTextFromTexts(int indexOfTextToDel)
-	{
-		JSONArray array = (JSONArray)savedTexts ["texts"];
-		array.Remove (indexOfTextToDel);
-		savedTexts ["texts"] = array;
-		SaveTextsToFile ();
-		
-		texts.RemoveAt (indexOfTextToDel);
-		optionsAmount -= 1;
-		//handle text inbox display
-		
-		if (indexOfTextToDel >= lowerIndexTextInView && indexOfTextToDel <= upperIndexTextInView) 
-		{
-			if (lowerIndexTextInView > 0)
-			{
-				lowerIndexTextInView -= 1;
-			}
-			
-			if (upperIndexTextInView > optionsAmount-1)
-			{
-				upperIndexTextInView = optionsAmount-1;
-			}
-		}
-		if (selectedTextIndex > optionsAmount-1)
-		{
-			selectedTextIndex = optionsAmount-1;
-		}
-		if (selectOptionAtIndex > optionsAmount-1)
-		{
-			selectOptionAtIndex = optionsAmount-1;
-		}
-	}*/
+	
 
 	//scroll up through a list of texts. With wrap-around
 	public static void ScrollUp()
@@ -194,20 +264,8 @@ public static class TextMessageOptions {
 			
 		}
 
-		int test = (int)collectionType;
-		if (collectionType == CollectionType.Inbox)
-		{
-			SetViewToInboxTextOptions();
-		}
-		else if (collectionType == CollectionType.Outbox)
-		{
-			SetViewToOutboxTextOptions();
-		}
-		//else if (collectionType == CollectionType.Create)
-		else if (collectionType == CollectionType.Drafts)
-		{
-			SetViewToDraftTextOptions();
-		}
+		int test = (int)m_collectionType; //TODO: delete
+		SetViewToTextOptions (m_collectionType);
 	}
 	
 	//scroll down through a list of texts. With wrap-around.
@@ -232,75 +290,27 @@ public static class TextMessageOptions {
 			selectedTextIndex += 1;
 		}
 
-		int test = (int)collectionType;
-		if (collectionType == CollectionType.Inbox)
-		{
-			SetViewToInboxTextOptions();
-		}
-		else if (collectionType == CollectionType.Outbox)
-		{
-			SetViewToOutboxTextOptions();
-		}
-		//else if (collectionType == CollectionType.Create)
-		else if (collectionType == CollectionType.Drafts)
-		{
-			SetViewToDraftTextOptions();
-		}
+		int test = (int)m_collectionType; //TODO: delete
+		SetViewToTextOptions (m_collectionType);
 	}
 
 	//set the indices needed to display the most recent text at the top of the list
 	public static void SetUpperIndexTextInViewToTop()
 	{
-		if (optionsAmount > maxTextsDisplayAmount) 
-		{
-			upperIndexTextInView = maxTextsDisplayAmount - 1;
+				if (optionsAmount > maxTextsDisplayAmount) {
+						upperIndexTextInView = maxTextsDisplayAmount - 1;
+				} else {
+						upperIndexTextInView = optionsAmount - 1;
+				}
 		}
-		else
-		{
-			upperIndexTextInView = optionsAmount -1;
-		}
+
+	public static void SetNewTextContent(string content)
+	{
+		m_newTextMessageContent = content;
 	}
 
-	public static void SelectEnter()
+	public static void SetNewTextRecipient(string recipient)
 	{
-		if (collectionType == CollectionType.Inbox)
-		{
-			if (selectOptionAtIndex == 0) //reply
-			{
-				Debug.Log ("reply");
-			}
-			else if (selectOptionAtIndex == 1) //delete
-			{
-				DeleteTextViaOptions();
-			}
-		}
-		else if (collectionType == CollectionType.Outbox)
-		{
-			if (selectOptionAtIndex == 0) //delete
-			{
-				DeleteTextViaOptions();
-			}
-		}
-		else if (collectionType == CollectionType.Drafts)
-			//else if (collectionType == CollectionType.Create)
-		{
-			if (selectOptionAtIndex == 0) //enter contact
-			{
-				Debug.Log ("enter contact");
-			}
-			else if (selectOptionAtIndex == 1) //enter number
-			{
-				Debug.Log ("enter number");
-			}
-			else if (selectOptionAtIndex == 2) //save and quit
-			{
-				Debug.Log ("save and quit");
-			}
-			else if (selectOptionAtIndex == 3) //quit without saving
-			{
-				Debug.Log ("quit without saving");
-				ps.SetViewToSubMainMenu();
-			}
-		}
+		m_newTextMessageRecipient = recipient;
 	}
 }

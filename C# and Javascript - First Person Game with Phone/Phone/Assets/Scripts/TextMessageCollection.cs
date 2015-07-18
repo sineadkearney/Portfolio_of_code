@@ -28,20 +28,27 @@ public class TextMessageCollection {
 		Inbox,
 		Outbox,
 		Drafts,
+		Create,
 	};
 	private CollectionType collectionType; //the type of collection, ie inbox or output
+
+	//private TextMessageOptions.CollectionType collectionType;
 
 	//constructor
 	public TextMessageCollection(string incomingFileName, CollectionType type)
 	{
 		fileName = incomingFileName;
-		fileData = FileManager.Load (fileName);
+
 		//int intType = (int)type;
 		collectionType = type;
 		cc = ps.cc;
 
-		LoadSavedTexts ();
-		SetUpperIndexTextInViewToTop ();
+		if (fileName != "")
+		{
+			fileData = FileManager.Load (fileName);
+			LoadSavedTexts ();
+			SetUpperIndexTextInViewToTop ();
+		}
 	}
 
 	//take a json string, parse it, populate IList<TextMessage> texts with those texts in the json
@@ -91,14 +98,17 @@ public class TextMessageCollection {
 	//set up all vars for a new inbox text
 	public void HandleNewIncomingText(TextMessage text, bool rewriteFile)
 	{
-		AddTextToTexts(text, rewriteFile);
-		ps.hasUnreadTexts = true;
-		ps.HandleHasUnreadMessages();
-		SetUpperIndexTextInViewToTop ();
-		
-		if (PhoneState.GetState () == PhoneState.State.TextMessageInbox) 
+		if (collectionType == CollectionType.Inbox)
 		{
-			SetViewToTextMessageCollection();//refresh
+			AddTextToTexts(text, rewriteFile);
+			ps.hasUnreadTexts = true;
+			ps.HandleHasUnreadMessages();
+			SetUpperIndexTextInViewToTop ();
+			
+			if (PhoneState.GetState () == PhoneState.State.TextMessageInbox) 
+			{
+				SetViewToTextMessageCollection();//refresh
+			}
 		}
 	}
 
@@ -111,13 +121,16 @@ public class TextMessageCollection {
 			JSONArray array = (JSONArray)savedTexts ["texts"];
 			for (int i = textsLength; i > 0; i --) //move all contacts up an index in the array
 			{
-				array[i]["sender"] = array[i-1]["name"];
+				array[i]["sender"] = array[i-1]["sender"];
+				Debug.Log ("recipient: '" + array[i-1]["recipient"] + "'");
+				array[i]["recipient"] = array[i-1]["recipient"];
 				array[i]["message"] = array[i-1]["message"];
 				array[i]["timestamp"] = array[i-1]["timestamp"];
 				array[i]["isRead"] = array[i-1]["isRead"];
 				array[i]["isTraceable"] = array[i-1]["isTraceable"];
 			}
 			array[0]["sender"] = text.GetSender(); //add the new text at the top
+			array[0]["recipient"] = text.GetRecipient();
 			array[0]["message"] = text.GetMessage();
 			array[0]["timestamp"] = ""+text.GetTimestamp();
 			array[0]["isRead"] = ""+text.HasBeenRead();
@@ -364,23 +377,12 @@ public class TextMessageCollection {
 	public void SetViewToTextMessageOptions()
 	{
 		indexOfTextInOptions = readTextAtIndex;
-		if (collectionType == CollectionType.Inbox)
-		{
-			TextMessageOptions.SetViewToInboxTextOptions();	
-		}
-		else if (collectionType == CollectionType.Outbox)
-		{
-			TextMessageOptions.SetViewToOutboxTextOptions();	
-		}
-		else if (collectionType == CollectionType.Drafts)
-		{
-			TextMessageOptions.SetViewToDraftTextOptions();
-		}
+		TextMessageOptions.SetViewToTextOptions (collectionType);
 	}
 
 	public void SetViewToEnterRecipient()
 	{
-
+		Debug.Log ("SetViewToEnterRecipient()");
 	}
 
 	public void SetViewToTextMessageCreate()
@@ -398,7 +400,10 @@ public class TextMessageCollection {
 
 	public string GetBodyOfSelectedDraftText()
 	{
-		return texts [readTextAtIndex].GetMessage ();
+		if (collectionType == CollectionType.Drafts)
+			return texts [readTextAtIndex].GetMessage ();
+		else
+			return "";
 	}
 
 	//delete the selected text
