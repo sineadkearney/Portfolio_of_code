@@ -15,9 +15,12 @@ public class PhoneState {
 		TextMessageCreate,
 		TextMessageDrafts,
 		TextMessageOptions,
-		ContactsList, //contacts list, just as normal
+		ContactsList, 				//contacts list, just as normal
 		ContactsListTextRecipient, //contact list, when we're sending a text
-		NumberTextRecipient, //manualling entering a number, when we're sending a text
+		ContactsOptions,			//the options for the contact when viewing from the list
+		ContactsNewOptions,			// the options for the contact when we are creating a contact
+		CreateNewContact,
+		NumberTextRecipient, //manually entering a number, when we're sending a text
 		ErrorMessage,
 	};
 

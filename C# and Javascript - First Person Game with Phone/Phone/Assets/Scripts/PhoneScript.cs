@@ -14,7 +14,7 @@ public class PhoneScript : MonoBehaviour {
 	//private string createTextMessageContent = "";
 
 	private string numberOnScreen;
-	private string homeScreenTextContentOrig = "Welcome";
+	private string homeScreenTextContentOrig = "TODO: create new contact";//"Welcome";
 	private string homeScreenTextContent;
 
 	private TextMessageCollection inboxTexts;
@@ -31,9 +31,14 @@ public class PhoneScript : MonoBehaviour {
 	public GameObject receptionIcon;
 	public Sprite hasReceptionSprite;
 	public Sprite noReceptionSprite;
+	
 	public bool hasUnreadTexts = false;
 	public GameObject messageIcon;
 	public Sprite hasNewMessageSprite;
+
+	//uses messageIcon object for now
+	public Sprite inAlphaMode;
+	public Sprite inNumberMode;
 
 	private TextMessageMenu tmm;
 	private MainMenu mm;
@@ -44,6 +49,8 @@ public class PhoneScript : MonoBehaviour {
 	private float creditAmount = 0.0f;
 
 	private string savedInput = "";
+
+	private bool hasHighlightedCreateANewContact = false;
 
 	// Use this for initialization
 	//TurnOnPhone()
@@ -64,14 +71,6 @@ public class PhoneScript : MonoBehaviour {
 		cc = new ContactsCollection ();	
 		cc.LoadSavedContacts ();
 
-		//example of adding a new contact
-		//Contact c5 = new Contact ("lisa", "1234567");
-		//cc.AddContactToContacts (c5, true);
-
-		//example of adding a new inbox text
-		//TextMessage txt1 = new TextMessage ("1234", "content txt1");
-		//inboxTexts.HandleNewIncomingText(txt1, true);
-
 		MainMenu.SetState (MainMenu.MainMenuState.Messages);
 		TextMessageMenu.SetState (TextMessageMenu.TextMessageMenuState.Inbox);
 		numberOnScreen = "";
@@ -87,6 +86,15 @@ public class PhoneScript : MonoBehaviour {
 		{
 			receptionIcon.GetComponent<SpriteRenderer> ().sprite = noReceptionSprite;
 		}
+
+		//example of adding a new contact
+		//Contact c5 = new Contact ("lisa", "1234567");
+		//cc.AddContactToContacts (c5, true);
+		
+		//example of adding a new inbox text
+		//TextMessage txt1 = new TextMessage ("1234", "content txt1");
+		//inboxTexts.HandleNewIncomingText(txt1, true);
+
 		//example of adding a new outbox text
 		//TextMessage outText = new TextMessage ("me", "my text message");
 		//outboxTexts.AddTextToTexts(outText);
@@ -111,6 +119,11 @@ public class PhoneScript : MonoBehaviour {
 		cs.SetDebugPhoneState (state);
 	}
 
+	//////////////////////////////////////////////////////////////////
+	/// 
+	/// This is the function that is called from the first person game, when the player walks into a trigger box
+	/// 
+	//////////////////////////////////////////////////////////////////
 	[RPC]
 	void UpdateText(string content)
 	{
@@ -121,14 +134,14 @@ public class PhoneScript : MonoBehaviour {
 	//if in the main menu, show a message that we have a new text/have no new texts
 	public void HandleHasUnreadMessages()
 	{
+		SetHasMessagesIcon ();
+
 		if (hasUnreadTexts)
 		{
-			messageIcon.GetComponent<SpriteRenderer> ().sprite = hasNewMessageSprite;
 			homeScreenTextContent = homeScreenTextContentOrig + "\nNew Message!";
 		}
 		else
 		{
-			messageIcon.GetComponent<SpriteRenderer> ().sprite = null;
 			homeScreenTextContent = homeScreenTextContentOrig + "\nNo New Messages";
 		}
 
@@ -138,6 +151,24 @@ public class PhoneScript : MonoBehaviour {
 		}
 	}
 
+	//sets the icon to an envelope or to nothing
+	public void SetHasMessagesIcon()
+	{
+		if (hasUnreadTexts)
+		{
+			messageIcon.GetComponent<SpriteRenderer> ().sprite = hasNewMessageSprite;
+		}
+		else
+		{
+			messageIcon.GetComponent<SpriteRenderer> ().sprite = null;
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////
+	/// 
+	/// The user is entering a number into the phone, when they were on the home screen
+	/// 
+	//////////////////////////////////////////////////////////////////
 	//add a digit to the number being entered on the screen
 	public void AddToNumberOnScreen(int num)
 	{
@@ -169,16 +200,96 @@ public class PhoneScript : MonoBehaviour {
 
 	public void SaveNumberOnScreenToContacts()
 	{
-		string name = "test"; //TODO: hardcoded for now
+		//TODO: do I want to be able to do this?
+
+		/*string name = "test"; //TODO: hardcoded for now
 		SaveNewContact (name, numberOnScreen);
 		numberOnScreen = "";
-		UpdateNumberOnScreen ();
+		UpdateNumberOnScreen ();*/
 	}
 
 	private void SaveNewContact (string name, string number)
 	{
 		Contact c = new Contact (name, number);
 		cc.AddContactToContacts (c, true);
+	}
+
+	public void SetHasHighlightedCreateANewContact(bool newValue)
+	{
+		hasHighlightedCreateANewContact = newValue;
+	}
+
+	public bool GetHasHighlightedCreateANewContact()
+	{
+		return hasHighlightedCreateANewContact;
+	}
+
+	public void SetViewToAddNewContact()
+	{
+		PhoneState.SetState (PhoneState.State.CreateNewContact);
+		cs.SetHeadingText ("Create a new contact");
+		cs.SetNavLeftText ("Options");
+		cs.SetNavRightText ("Delete");
+		cs.SetLineContent(1, "Enter name:", false);
+		cs.SetLineContent(3, "Enter number:", false);
+		tsc.Enable ();
+
+		tsc.SetTextArea("SetLineContent(2)");
+		tsc.SetInAplhaInputMode (true); //we are in number-only mode
+		//tsc.SetAlphaNumberIcon ();
+		tsc.SetInitialContent ("");
+
+		tempContact = new Contact("", "");
+		//enteringName = true;
+	}
+
+	private Contact tempContact;
+	private bool enteringName = true;
+	public void AddNewContactMoveUpDown()
+	{
+		enteringName = !enteringName;
+
+		if (!enteringName) //we are entering the number
+		{
+			string nameEntered = tsc.GetCreatedString ();
+			cs.SetLineContent(2, nameEntered, false);
+			tempContact.SetName (nameEntered);
+
+			tsc.SetTextArea("SetLineContent(4)");
+			tsc.SetInAplhaInputMode (false); //we are in number mode.
+			tsc.SetInitialContent (tempContact.GetNumber());
+		}
+		else //we are entering the name
+		{
+			string numberEntered = tsc.GetCreatedString();
+			cs.SetLineContent (4, numberEntered, false); //gets rid of the cursor
+			tempContact.SetNumber(numberEntered);
+
+			//set up entering the name (or going back to edit i)
+			tsc.SetTextArea("SetLineContent(2)");
+			tsc.SetInAplhaInputMode (true); //we are in alpha mode. 
+			tsc.SetInitialContent (tempContact.GetName());
+		}
+	}
+
+	public void SetViewToNewContactOptions()
+	{
+		bool inAplhaInputMode = tsc.GetInAplhaInputMode();
+
+		if (inAplhaInputMode) 
+		{
+			string nameEntered = tsc.GetCreatedString ();
+			tempContact.SetName (nameEntered);
+		}
+		else
+		{
+			string numberEntered = tsc.GetCreatedString();
+			tempContact.SetNumber(numberEntered);
+		}
+
+		cs.SetHeadingText ("Options");
+		cs.SetNavLeftText ("Back");
+		cs.SetNavRightText ("Select");
 	}
 
 	void UpdateHomeScreen()
@@ -189,6 +300,7 @@ public class PhoneScript : MonoBehaviour {
 		}
 	}
 
+	//the user has pressed the "hang up" button. Quit whatever they were doing and send the user back to the home screen
 	public void ResetAndSetViewToHomeScreen()
 	{
 		numberOnScreen = "";
@@ -209,16 +321,6 @@ public class PhoneScript : MonoBehaviour {
 		mm.SetView ();
 	}
 
-	public void MainMenuScrollUp()
-	{
-		mm.ScrollUp ();
-	}
-
-	public void MainMenuScrollDown()
-	{
-		mm.ScrollDown ();
-	}
-
 	public void SetViewToSubMainMenu()
 	{
 		if (mm.GetState() == MainMenu.MainMenuState.Messages)
@@ -231,22 +333,12 @@ public class PhoneScript : MonoBehaviour {
 		}
 	}
 
-	public void ShowAllContactsForPossibleTextRecipient()
-	{
-		cc.ShowAllContactsForPossibleTextRecipient();
-	}
-
-
-	public void TextMessMenuScrollUp()
-	{
-		tmm.ScrollUp ();
-	}
-
-	public void TextMessMenuScrollDown()
-	{
-		tmm.ScrollDown ();
-	}
-
+	//////////////////////////////////////////////////////////////////
+	/// 
+	/// If we selected to go to Inbox, Outbox or Drafts, set the view to the list of these texts
+	/// If we selected to go to Create, set up the phone to allow the user to create a text
+	/// 
+	//////////////////////////////////////////////////////////////////
 	public void SetViewToTextMessageCollection()
 	{
 		if (TextMessageMenu.GetState() == TextMessageMenu.TextMessageMenuState.Inbox)
@@ -262,24 +354,23 @@ public class PhoneScript : MonoBehaviour {
 		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Create)
 		{
 			PhoneState.SetState (PhoneState.State.TextMessageCreate);
+			tsc.Enable();
 			tsc.SetTextArea("SetScreenText()");
-			//draftTexts.SetViewToTextMessageCreate();
-			newlyWrittenText.SetViewToTextMessageCreate();
+			tsc.SetAlphaNumberIcon();
+			newlyWrittenText.SetViewToTextMessageCreate(true);
 		}
 		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Drafts)
 		{
 			PhoneState.SetState (PhoneState.State.TextMessageDrafts);
-			tsc.SetTextArea("SetScreenText()");
 			draftTexts.SetViewToTextMessageCollection ();
 		}
 	}
 
-	//TODO: when we are writing a text, then go to options
-	public void GoBackToEditText()
-	{
-		//newlyWrittenText.SetViewToTextMessageCreate();
-	}
-
+	//////////////////////////////////////////////////////////////////
+	/// 
+	/// Set the screen view to the selected inbox or outbox text
+	/// 
+	//////////////////////////////////////////////////////////////////
 	public void ReadSelectedInboxText()
 	{
 		inboxTexts.ReadSelectedText ();
@@ -290,29 +381,43 @@ public class PhoneScript : MonoBehaviour {
 		outboxTexts.ReadSelectedText ();
 	}
 
+	//////////////////////////////////////////////////////////////////
+	/// 
+	/// Resume writing a text. Either a draft, or we went into the "Options" menu but then returned to writing the text
+	/// 
+	//////////////////////////////////////////////////////////////////
 	public void ContinueEditingSelectedDraftText()
 	{
 		string draftContent = draftTexts.GetBodyOfSelectedDraftText ();
 		PhoneState.SetState (PhoneState.State.TextMessageCreate);
+		tsc.Enable();
 		tsc.SetTextArea("SetScreenText()");
+		tsc.SetAlphaNumberIcon ();
 		tsc.SetInitialContent (draftContent);
-		draftTexts.SetViewToTextMessageCreate();
-		//TODO: this is saying "back" when it should say "delete"
+	
+		draftTexts.SetViewToTextMessageCreate(false);
+
 	}
 
 	public void GoBackToEditingNewMessageOrDraft(bool isDraft)
 	{
 		PhoneState.SetState (PhoneState.State.TextMessageCreate);
+		tsc.Enable();
 		tsc.SetTextArea("SetScreenText()");
 		tsc.SetInitialContent (savedInput);
 
 		//TODO: probably don't need this if checks
 		if (isDraft)
-			draftTexts.SetViewToTextMessageCreate();
+			draftTexts.SetViewToTextMessageCreate(false);
 		else
-			newlyWrittenText.SetViewToTextMessageCreate();
+			newlyWrittenText.SetViewToTextMessageCreate(false);
 	}
 
+	//////////////////////////////////////////////////////////////////
+	/// 
+	/// Delete a text
+	/// 
+	//////////////////////////////////////////////////////////////////
 	public void DeleteSelectedInboxText()
 	{
 		inboxTexts.DeleteSelectedText ();
@@ -326,6 +431,12 @@ public class PhoneScript : MonoBehaviour {
 	{
 		draftTexts.DeleteSelectedText ();
 	}
+
+	//////////////////////////////////////////////////////////////////
+	/// 
+	/// Set the view to options for the selected text message
+	/// 
+	//////////////////////////////////////////////////////////////////
 	public void SetViewToTextMessageOptions()
 	{
 		if (TextMessageMenu.GetState() == TextMessageMenu.TextMessageMenuState.Inbox)
@@ -345,6 +456,7 @@ public class PhoneScript : MonoBehaviour {
 			
 			tsc.FinishInputAndReset();
 			tsc.UpdateTextMessageContent("");//clear whatever text area that we were writing to
+			tsc.Disable();
 			newlyWrittenText.SetViewToTextMessageOptions();
 		}
 		else if (TextMessageMenu.GetState () == TextMessageMenu.TextMessageMenuState.Drafts)
@@ -356,40 +468,80 @@ public class PhoneScript : MonoBehaviour {
 
 			tsc.FinishInputAndReset();
 			tsc.UpdateTextMessageContent("");//clear whatever text area that we were writing to
+			tsc.Disable();
 			draftTexts.SetViewToTextMessageOptions();
 		}
 	}
 
+	//////////////////////////////////////////////////////////////////
+	/// 
+	/// Functions for sending a text to a contact or a manually entered number
+	/// 
+	//////////////////////////////////////////////////////////////////
+	// show the list of contacts to the user, so they can see who they can send a text who
+	public void ShowAllContactsForPossibleTextRecipient()
+	{
+		cc.ShowAllContactsForPossibleTextRecipient();
+	}
+	
 	public void SelectContactAsTextRecipient()
 	{
 		Contact textRecipient = cc.SelectContactAsTextRecipient ();
 		TextMessage savedText = TextMessageOptions.GetSavedText ();
 
 		savedText.SetRecipient (textRecipient.GetNumber());
-		SendText ();
+		SendText (savedText);
 		SetViewToMainMenu ();
 	}
 
+	//set up the screen to allow the user to type in the number of the person who they want to text
 	public void EnterNumberAsTextRecipient()
 	{
 		PhoneState.SetState (PhoneState.State.NumberTextRecipient);
+		cs.SetHeadingText ("Enter Number");
+		tsc.Enable ();
 		tsc.SetTextArea("SetScreenText()");
+		tsc.SetInAplhaInputMode (false); //we are in number-only mode
+		tsc.SetAlphaNumberIcon ();
 		tsc.SetInitialContent ("");
-
-		/*string numberEntered = "";
-		TextMessage savedText = TextMessageOptions.GetSavedText ();
-		savedText.SetRecipient (numberEntered);
-		SendText ();
-		SetViewToMainMenu ();*/
 	}
 
-	public void SendText()
+	//The user entered the number of the person who they want to text. They have pressed "Send" to send the text. Get the number entered, and send the text
+	public void GetNumberEnteredAndSendText()
+	{
+		string numberEntered = tsc.GetCreatedString ();
+		Debug.Log ("send text to " + numberEntered);
+
+		TextMessage savedText = TextMessageOptions.GetSavedText ();
+		savedText.SetRecipient (numberEntered);
+		SendText (savedText);
+		SetViewToMainMenu ();
+
+	}
+
+	public void SendText(TextMessage textMessage)
 	{
 		//TODO: check has credit, check has reception
 
 		Debug.Log ("send text");
 
 	}
+	
+	//////////////////////////////////////////////////////////////////
+	/// 
+	/// Functions for scrolling through various menus
+	/// 
+	//////////////////////////////////////////////////////////////////
+	public void MainMenuScrollUp()
+	{
+		mm.ScrollUp ();
+	}
+	
+	public void MainMenuScrollDown()
+	{
+		mm.ScrollDown ();
+	}
+
 	public void InboxScrollUp()
 	{
 		inboxTexts.ScrollUp ();
@@ -430,11 +582,31 @@ public class PhoneScript : MonoBehaviour {
 		cc.ScrollDown ();
 	}
 
+	public void TextMessMenuScrollUp()
+	{
+		tmm.ScrollUp ();
+	}
+	
+	public void TextMessMenuScrollDown()
+	{
+		tmm.ScrollDown ();
+	}
+
+	//////////////////////////////////////////////////////////////////
+	/// 
+	/// Functions for making outgoing calls
+	/// 
+	//////////////////////////////////////////////////////////////////
 	public void HandleOutGoingCall()
 	{
 		ShowErrorMessage("You have no credit");
 	}
 
+	//////////////////////////////////////////////////////////////////
+	/// 
+	/// Functions for handling unexpected errors
+	/// 
+	//////////////////////////////////////////////////////////////////
 	public void ShowErrorMessage(string content)
 	{
 		PhoneState.SetState(PhoneState.State.ErrorMessage);

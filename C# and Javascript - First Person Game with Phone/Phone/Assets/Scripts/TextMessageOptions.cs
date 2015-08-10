@@ -137,7 +137,6 @@ public static class TextMessageOptions {
 				
 				//TODO: what if we are over-writing an old draft text? This will just add a new one
 				ps.draftTexts.AddTextToTexts(savedText, true);
-				//sps.SetViewToSubMainMenu();
 				ps.SetViewToTextMessageCollection();
 			}
 			else if (selectOptionAtIndex == 3)
@@ -162,7 +161,7 @@ public static class TextMessageOptions {
 			else if (selectOptionAtIndex == 1)
 			{
 				Debug.Log ("enter number");
-				//ps.EnterNumberAsTextRecipient();
+				ps.EnterNumberAsTextRecipient();
 			}
 			else if (selectOptionAtIndex == 2) //save and quit
 			{
@@ -264,7 +263,6 @@ public static class TextMessageOptions {
 			
 		}
 
-		int test = (int)m_collectionType; //TODO: delete
 		SetViewToTextOptions (m_collectionType);
 	}
 	
@@ -289,8 +287,6 @@ public static class TextMessageOptions {
 			selectOptionAtIndex += 1;
 			selectedTextIndex += 1;
 		}
-
-		int test = (int)m_collectionType; //TODO: delete
 		SetViewToTextOptions (m_collectionType);
 	}
 

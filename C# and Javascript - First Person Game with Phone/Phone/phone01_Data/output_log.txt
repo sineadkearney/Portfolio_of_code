@@ -1,0 +1,195 @@
+Initialize engine version: 4.6.1f1 (d1db7a1b5196)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: Intel(R) HD Graphics 4000 (ID=0x166)
+    Vendor:   Intel
+    VRAM:     128 MB
+Begin MonoManager ReloadAssembly
+Platform assembly: C:\Users\Sinead\Documents\Phone\phone01_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\Sinead\Documents\Phone\phone01_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\Sinead\Documents\Phone\phone01_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\Sinead\Documents\Phone\phone01_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\Sinead\Documents\Phone\phone01_Data\Managed\Assembly-UnityScript.dll (this message is harmless)
+Loading C:\Users\Sinead\Documents\Phone\phone01_Data\Managed\Assembly-UnityScript.dll into Unity Child Domain
+Platform assembly: C:\Users\Sinead\Documents\Phone\phone01_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\Sinead\Documents\Phone\phone01_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+- Completed reload, in  0.266 seconds
+desktop: 1366x768 60Hz; virtual: 1366x768 at 0,0
+<RI> Initializing input.
+<RI> Input initialized.
+Platform assembly: C:\Users\Sinead\Documents\Phone\phone01_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\Users\Sinead\Documents\Phone\phone01_Data\Managed\System.dll (this message is harmless)
+Platform assembly: C:\Users\Sinead\Documents\Phone\phone01_Data\Managed\UnityScript.Lang.dll (this message is harmless)
+refreshing
+ 
+(Filename: C:/BuildAgent/work/d63dfc6385190b60/artifacts/StandalonePlayerGenerated/UnityEngineDebug.cpp Line: 49)
+
+Platform assembly: C:\Users\Sinead\Documents\Phone\phone01_Data\Managed\Boo.Lang.dll (this message is harmless)
+Connected to master server at 67.225.180.24:23466
+ 
+(Filename:  Line: 2484)
+
+Incoming host list query response from master server.
+ 
+(Filename:  Line: 2484)
+
+1
+ 
+(Filename: C:/BuildAgent/work/d63dfc6385190b60/artifacts/StandalonePlayerGenerated/UnityEngineDebug.cpp Line: 49)
+
+Running as client. No player ID set yet.
+ 
+(Filename:  Line: 2484)
+
+Connected to 192.168.0.31:25002
+
+ 
+(Filename:  Line: 2484)
+
+OnConnectedToServer
+ 
+(Filename: C:/BuildAgent/work/d63dfc6385190b60/artifacts/StandalonePlayerGenerated/UnityEngineDebug.cpp Line: 49)
+
+Set player ID to 1
+
+ 
+(Filename:  Line: 2484)
+
+Received state update for view ID SceneID: 2 Level Prefix: 0
+
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Received RPC 'UpdateText'- mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+Relay RPC - name: UpdateText - mode 2 - sender 192.168.0.31:25002
+ 
+(Filename:  Line: 2494)
+
+The server has disconnected from the client. Most likely the server has shut down.
+ 
+(Filename:  Line: 745)
+

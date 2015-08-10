@@ -385,11 +385,15 @@ public class TextMessageCollection {
 		Debug.Log ("SetViewToEnterRecipient()");
 	}
 
-	public void SetViewToTextMessageCreate()
+	public void SetViewToTextMessageCreate(bool setLeftToBack)
 	{
 		cs.SetHeadingText("Create");
-		cs.SetNavLeftText("Back");
 		cs.SetNavRightText("Options");
+
+		if (setLeftToBack) 
+		{
+			cs.SetNavLeftText("Back");
+		}
 	}
 
 	//display the selected text

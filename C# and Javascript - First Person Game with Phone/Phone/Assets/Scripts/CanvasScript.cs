@@ -150,13 +150,11 @@ public class CanvasScript : MonoBehaviour {
 
 	public void SetScreenText(string content)
 	{
-		//StackFrame fr = new StackFrame(1,true);
-		//StackTrace st = new StackTrace(fr);
 		screenText.text = content;
 	}
 
-	public void SetMessageIconText(string content)
+	/*public void SetMessageIconText(string content)
 	{
 		messageIconText.text = content;
-	}
+	}*/
 }

@@ -142,8 +142,10 @@ public class ContactsCollection {
 		
 		if (contactsLength == 0) 
 		{
-			cs.SetLineContent(index, "No Contacts", false);
-			cs.SetNavRightText ("");
+			//cs.SetLineContent(index, "No Contacts", false);
+			//cs.SetNavRightText ("");
+			cs.SetLineContent(1, "Add a new contact", true);
+			ps.SetViewToAddNewContact();
 		}
 		else
 		{
@@ -170,6 +172,7 @@ public class ContactsCollection {
 	public void ShowAllContactsForPossibleTextRecipient()
 	{
 		PhoneState.SetState (PhoneState.State.ContactsListTextRecipient);
+		cs.SetHeadingText ("Select Contact");
 		int index = 1;
 		int count = 0;
 		//ps.hasUnreadTexts = false;
